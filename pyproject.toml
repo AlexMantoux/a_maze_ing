@@ -1,0 +1,18 @@
+[project]
+name = "a-maze-ing"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "tristan-gscn",email = "tristan.gscn@proton.me"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "a_maze_ing", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
