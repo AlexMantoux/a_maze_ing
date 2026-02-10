@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from src.a_maze_ing.parsing import parse_config
+
 
 def main() -> int:
     """Run the CLI entry point for the project."""
@@ -22,7 +24,8 @@ def main() -> int:
         print(f"Config file not found: {config_path}")
         return 1
 
-    print(f"Loaded config: {config_path}")
+    print(parse_config(str(config_path)))
+
     return 0
 
 
