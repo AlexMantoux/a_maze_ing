@@ -67,3 +67,19 @@ def render_ascii(
     lines.append(bottom_line)
     
     return "\n".join(lines)
+
+
+def render_hex(grid: list[list[Cell]]) -> str:
+    """
+    Render a maze grid as hexadecimal values.
+    
+    Each cell is displayed as its hex representation based on walls
+    """
+    if not grid or not grid[0]:
+        return ""
+    
+    lines = []
+    for row in grid:
+        lines.append("".join(str(cell) for cell in row))
+    
+    return "\n".join(lines)

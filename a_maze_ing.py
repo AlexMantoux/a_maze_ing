@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
@@ -33,6 +34,10 @@ def main() -> int:
         
         maze = generate_dfs(config)
         print(render_ascii(maze, config["ENTRY"], config["EXIT"]))
+
+        print()
+
+        print(a_star(config["ENTRY"], config["EXIT"], maze))
     except Exception as e:
         print(e)
         return 1
