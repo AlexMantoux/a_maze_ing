@@ -55,7 +55,7 @@ def _remove_walls_between(cell1: Cell, cell2: Cell) -> None:
             cell2.west = False
 
 def generate_dfs(config: dict[str, int | tuple[int, int] | str | bool]):
-    y, x = config["ENTRY"]
+    x, y = config["ENTRY"]
     grid = _generate_full_grid(config["WIDTH"], config["HEIGHT"])
     current = grid[y][x]
     current.state = CellState.VISITED

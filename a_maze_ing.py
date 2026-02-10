@@ -8,6 +8,7 @@ from pathlib import Path
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
+from src.a_maze_ing.rendering import render_ascii
 
 
 def main() -> int:
@@ -29,11 +30,9 @@ def main() -> int:
     try:
         config = parse_config(str(config_path))
         check_config_mandatory(config)
-        print(config)
         
         maze = generate_dfs(config)
-        for row in maze:
-            print("".join(str(cell) for cell in row))
+        print(render_ascii(maze, config["ENTRY"], config["EXIT"]))
     except Exception as e:
         print(e)
         return 1

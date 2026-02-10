@@ -9,7 +9,6 @@ install:
 	@poetry install
 
 run:
-	@echo "Running the project..."
 	@$(POETRY) python a_maze_ing.py config.txt
 
 debug:
