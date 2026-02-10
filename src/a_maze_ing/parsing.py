@@ -8,7 +8,8 @@ class ParsingError(Exception):
 def _check_line_format(line: str) -> None:
     PATTERN = r"^[^=]+=[^=]+$"
     if not re_match(PATTERN, line):
-        raise ParsingError("Invalid line format. Expected format: KEY=value.")
+        raise ParsingError(f"Invalid line format for '{line.strip()}'. "
+                           f"Expected format: KEY=value.")
 
 
 def _check_tuple_format(tuple_str: str) -> None:
@@ -30,15 +31,15 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
 
     line_splitted = line.split("=")
     if not line_splitted[0] in KEYS_TYPES:
-        raise ParsingError(f"Invalid key in config line. Valid keys are: "
-                           f"{", ".join(
+        raise ParsingError(f"Invalid key '{line_splitted[0]}' in config line. "
+                           f"Valid keys are: {", ".join(
                                [str(key) for key in KEYS_TYPES.keys()]
                            )}.")
     if KEYS_TYPES[line_splitted[0]] == int:
         try:
             return int(line_splitted[1])
         except ValueError:
-            raise ParsingError(f"Invalid value type for '{line_splitted[0]}' "
+            raise ParsingError(f"Invalid value type for '{line.strip()}' "
                                f"in config line. Should be an integer.")
     if KEYS_TYPES[line_splitted[0]] == tuple[int, int]:
         try:
@@ -46,21 +47,24 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
             value_splitted = line_splitted[1].split(",")
             return (int(value_splitted[0]), int(value_splitted[1]))
         except (ParsingError, ValueError):
-            raise ParsingError("Invalid tuple format and type. "
-                               "Expected format: INT,INT.")
+            raise ParsingError(f"Invalid tuple format and type for "
+                               f"'{line.strip()}'. Expected format: "
+                               f"KEY=INT,INT.")
     if KEYS_TYPES[line_splitted[0]] == str:
         if not line_splitted[1].strip():
-            raise ParsingError("Invalid string value. Cannot be empty.")
+            raise ParsingError(f"Invalid string value for '{line.strip()}'. "
+                               f"Cannot be empty.")
         return line_splitted[1].strip()
     if KEYS_TYPES[line_splitted[0]] == bool:
         try:
             if not (line_splitted[1].strip() == "True"
                     or line_splitted[1].strip() == "False"):
-                raise ParsingError("Invalid boolean format. "
+                raise ParsingError(f"Invalid format for '{line.strip()}'. "
                                    "Should be a boolean.")
             return line_splitted[1].strip() == "True"
         except ParsingError:
-            raise ParsingError("Invalid boolean format. Should be a boolean.")
+            raise ParsingError(f"Invalid format for '{line.strip()}'. "
+                               f"Should be a boolean.")
     return None
 
 
@@ -68,12 +72,8 @@ def parse_config(path: str) -> (
         dict[str, int | tuple[int, int] | str | bool | None] | None
 ):
     with open(path, "r") as f:
-        try:
-            result = {}
-            for line in f:
-                _check_line_format(line)
-                result[line.split("=")[0]] = _get_line_value(line)
-            return result
-        except ParsingError as e:
-            print(e)
-    return None
+        result = {}
+        for line in f:
+            _check_line_format(line)
+            result[line.split("=")[0]] = _get_line_value(line)
+        return result

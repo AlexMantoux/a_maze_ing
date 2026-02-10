@@ -24,7 +24,11 @@ def main() -> int:
         print(f"Config file not found: {config_path}")
         return 1
 
-    print(parse_config(str(config_path)))
+    try:
+        print(parse_config(str(config_path)))
+    except Exception as e:
+        print(e)
+        return 1
 
     return 0
 
