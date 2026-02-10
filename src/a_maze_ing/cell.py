@@ -1,11 +1,13 @@
 from enum import Enum, auto
 
+
 class CellState(Enum):
     UNVISITED = auto()
     VISITED = auto()
     FRONTIER = auto()
     IN_MAZE = auto()
     PATH = auto()
+
 
 class Cell:
     def __init__(self,
@@ -15,7 +17,7 @@ class Cell:
                  south: bool,
                  west: bool,
                  coordinates: tuple[int, int]
-        ):
+                 ) -> None:
         self.state = state
 
         self.north = north
@@ -25,7 +27,7 @@ class Cell:
 
         self.coordinates = coordinates
 
-    def __str__(self):
+    def __str__(self) -> str:
         return hex(
             int(self.north) * 8 +
             int(self.east) * 4 +

@@ -15,18 +15,18 @@ def render_ascii(
 ) -> str:
     """
     Render a maze grid as ASCII art.
-    
+
     Each cell is represented as:
     +---+
     |   |
     +---+
-    
+
     Where walls are drawn based on the cell's wall attributes.
     Entry point is displayed in green, exit point in red.
     """
     if not grid or not grid[0]:
         return ""
-    
+
     height = len(grid)
     width = len(grid[0])
     lines = []
@@ -40,7 +40,7 @@ def render_ascii(
             top_line += "---" if cell.north else "   "
         top_line += "+"
         lines.append(top_line)
-        
+
         # Middle line of the row (west/east walls and cell content)
         mid_line = ""
         for x in range(width):
@@ -56,7 +56,7 @@ def render_ascii(
         # Last east wall
         mid_line += "|" if grid[y][width - 1].east else " "
         lines.append(mid_line)
-    
+
     # Bottom line (south walls of last row)
     bottom_line = ""
     for x in range(width):
@@ -65,21 +65,21 @@ def render_ascii(
         bottom_line += "---" if cell.south else "   "
     bottom_line += "+"
     lines.append(bottom_line)
-    
+
     return "\n".join(lines)
 
 
 def render_hex(grid: list[list[Cell]]) -> str:
     """
     Render a maze grid as hexadecimal values.
-    
+
     Each cell is displayed as its hex representation based on walls
     """
     if not grid or not grid[0]:
         return ""
-    
+
     lines = []
     for row in grid:
         lines.append("".join(str(cell) for cell in row))
-    
+
     return "\n".join(lines)

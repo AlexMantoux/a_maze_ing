@@ -1,7 +1,11 @@
 from src.a_maze_ing.cell import Cell, CellState
 from random import choice as random_choice
 
-def _get_neighbors(coordinates: tuple[int, int], grid: list[list[Cell]]) -> list[Cell]:
+
+def _get_neighbors(
+        coordinates: tuple[int, int],
+        grid: list[list[Cell]]
+) -> list[Cell]:
     x, y = coordinates
     neighbors = []
     height = len(grid)
@@ -17,6 +21,7 @@ def _get_neighbors(coordinates: tuple[int, int], grid: list[list[Cell]]) -> list
         neighbors.append(grid[y][x + 1])
 
     return neighbors
+
 
 def _generate_full_grid(width: int, height: int) -> list[list[Cell]]:
     grid = [
@@ -54,11 +59,18 @@ def _remove_walls_between(cell1: Cell, cell2: Cell) -> None:
             cell1.east = False
             cell2.west = False
 
+
 def generate_dfs(
         config: dict[str, int | tuple[int, int] | str | bool]
 ) -> list[list[Cell]]:
-    x, y = config["ENTRY"]
-    grid = _generate_full_grid(config["WIDTH"], config["HEIGHT"])
+    entry = config["ENTRY"]
+    assert isinstance(entry, tuple)
+    x, y = entry
+    width = config["WIDTH"]
+    height = config["HEIGHT"]
+    assert isinstance(width, int)
+    assert isinstance(height, int)
+    grid = _generate_full_grid(width, height)
     current = grid[y][x]
     current.state = CellState.VISITED
     stack = [current]
