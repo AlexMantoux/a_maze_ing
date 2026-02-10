@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 
 
@@ -25,7 +26,9 @@ def main() -> int:
         return 1
 
     try:
-        print(parse_config(str(config_path)))
+        config = parse_config(str(config_path))
+        check_config_mandatory(config)
+        print(config)
     except Exception as e:
         print(e)
         return 1

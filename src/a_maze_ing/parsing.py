@@ -5,7 +5,14 @@ class ParsingError(Exception):
     pass
 
 
+class CommentError(ParsingError):
+    pass
+
+
 def _check_line_format(line: str) -> None:
+    if not line.strip() or line[0] == "#":
+        raise CommentError("Line is a comment.")
+
     PATTERN = r"^[^=]+=[^=]+$"
     if not re_match(PATTERN, line):
         raise ParsingError(f"Invalid line format for '{line.strip()}'. "
@@ -68,12 +75,23 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
     return None
 
 
-def parse_config(path: str) -> (
-        dict[str, int | tuple[int, int] | str | bool | None] | None
-):
+def parse_config(path: str) \
+        -> dict[str, int | tuple[int, int] | str | bool | None]:
     with open(path, "r") as f:
         result = {}
         for line in f:
-            _check_line_format(line)
-            result[line.split("=")[0]] = _get_line_value(line)
+            try:
+                _check_line_format(line)
+                result[line.split("=")[0]] = _get_line_value(line)
+            except CommentError:
+                pass
         return result
+
+
+def check_config_mandatory(
+        config: dict[str, int | tuple[int, int] | str | bool | None]
+) -> None:
+    for key in ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]:
+        if key not in config:
+            raise ParsingError(f"Missing mandatory key '{key}' "
+                               f"in config file.")
