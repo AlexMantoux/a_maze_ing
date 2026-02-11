@@ -10,7 +10,9 @@ from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
-from src.a_maze_ing.rendering import render_hex
+from src.a_maze_ing.rendering import render_ascii
+from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
+from src.a_maze_ing.parsing import ParsingError
 
 
 def main() -> int:
@@ -42,6 +44,11 @@ def main() -> int:
         )
 
         maze = generate_dfs(validated_config)
+        ft_pattern = where_is_ft_pattern(maze)
+        if validated_config["ENTRY"] in ft_pattern:
+            raise ParsingError("Entry overlaps the 42 pattern.")
+        if validated_config["EXIT"] in ft_pattern:
+            raise ParsingError("Exit overlaps the 42 pattern.")
 
         output_file = validated_config["OUTPUT_FILE"]
         assert isinstance(output_file, str)
@@ -51,7 +58,7 @@ def main() -> int:
         assert isinstance(exit_pos, tuple)
 
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(render_hex(maze))
+            f.write(render_ascii(maze))
 
             f.write("\n\n")
 

@@ -20,7 +20,7 @@ def _check_line_format(line: str) -> None:
 
 
 def _check_tuple_format(tuple_str: str) -> None:
-    PATTERN = r"^\d+,\d+$"
+    PATTERN = r"^-?\d+,-?\d+$"
     if not re_match(PATTERN, tuple_str.strip()):
         raise ParsingError(
             f"Invalid tuple format: '{tuple_str}'. Expected format: INT,INT.")
@@ -38,10 +38,9 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
 
     line_splitted = line.split("=")
     if not line_splitted[0] in KEYS_TYPES:
+        VALID_KEYS = ', '.join([str(key) for key in KEYS_TYPES.keys()])
         raise ParsingError(f"Invalid key '{line_splitted[0]}' in config line. "
-                           f"Valid keys are: {", ".join(
-                               [str(key) for key in KEYS_TYPES.keys()]
-                           )}.")
+                           f"Valid keys are: {VALID_KEYS}.")
     if KEYS_TYPES[line_splitted[0]] == int:
         try:
             return int(line_splitted[1])
@@ -85,6 +84,16 @@ def parse_config(path: str) \
                 result[line.split("=")[0]] = _get_line_value(line)
             except CommentError:
                 pass
+        if result["ENTRY"][0] < 0 or \
+                result["ENTRY"][1] < 0 or \
+                result["ENTRY"][0] >= result["WIDTH"] or \
+                result["ENTRY"][1] >= result["HEIGHT"]:
+            raise ParsingError("Entry is out of the grid.")
+        if result["EXIT"][0] < 0 or \
+                result["EXIT"][1] < 0 or \
+                result["EXIT"][0] >= result["WIDTH"] or \
+                result["EXIT"][1] >= result["HEIGHT"]:
+            raise ParsingError("Exit is out of the grid.")
         return result
 
 

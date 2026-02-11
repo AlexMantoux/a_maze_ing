@@ -1,19 +1,19 @@
 NAME = a_maze_ing
-POETRY = poetry run
+POETRY = ~/.local/bin/poetry
 PY_FILES = $(shell find . -name "*.py")
 
 all: install
 
 install:
 	@echo "Installing dependencies with Poetry..."
-	@poetry install
+	@$(POETRY) install
 
 run:
-	@$(POETRY) python a_maze_ing.py config.txt
+	@$(POETRY) run python a_maze_ing.py config.txt
 
 debug:
 	@echo "Running in debug mode..."
-	@$(POETRY) python -m pdb a_maze_ing.py config.txt
+	@$(POETRY) run python -m pdb a_maze_ing.py config.txt
 
 clean:
 	@echo "Cleaning temporary files..."
@@ -23,12 +23,12 @@ clean:
 
 lint:
 	@echo "Linting with flake8 and mypy..."
-	@$(POETRY) flake8 $(PY_FILES)
-	@$(POETRY) mypy $(PY_FILES) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	@$(POETRY) run flake8 $(PY_FILES)
+	@$(POETRY) run mypy $(PY_FILES) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
 	@echo "Linting with strict mode..."
-	@$(POETRY) flake8 $(PY_FILES)
-	@$(POETRY) mypy $(PY_FILES) --strict
+	@$(POETRY) run flake8 $(PY_FILES)
+	@$(POETRY) run mypy $(PY_FILES) --strict
 
 .PHONY: all install run debug clean lint lint-strict

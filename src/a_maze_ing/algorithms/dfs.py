@@ -1,5 +1,6 @@
 from src.a_maze_ing.cell import Cell, CellState
 from random import choice as random_choice
+from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 
 
 def _get_neighbors(
@@ -33,6 +34,8 @@ def _generate_full_grid(width: int, height: int) -> list[list[Cell]]:
             ) for x in range(width)
         ] for y in range(height)
     ]
+    for x, y in where_is_ft_pattern(grid):
+        grid[y][x].state = CellState.VISITED
     return grid
 
 
