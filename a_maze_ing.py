@@ -10,9 +10,10 @@ from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
-from src.a_maze_ing.rendering import render_ascii
+from src.a_maze_ing.rendering import render_hex
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.parsing import ParsingError
+from src.a_maze_ing.gui import GUI
 
 
 def main() -> int:
@@ -58,13 +59,15 @@ def main() -> int:
         assert isinstance(exit_pos, tuple)
 
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(render_ascii(maze))
+            f.write(render_hex(maze))
 
             f.write("\n\n")
 
             f.write(f"{entry[0]},{entry[1]}\n")
             f.write(f"{exit_pos[0]},{exit_pos[1]}\n")
             f.write(f"{a_star(entry, exit_pos, maze)}\n")
+        
+        GUI(validated_config)
     except OSError as e:
         print(f"Error when writing into file : {e}")
     except Exception as e:
