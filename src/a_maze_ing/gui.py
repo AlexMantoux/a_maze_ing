@@ -14,6 +14,7 @@ from src.a_maze_ing.algorithms.a_star import a_star
 class GUI:
 	def __init__(self, config: dict) -> None:
 		self.config = config
+		self.animations_enabled = bool(self.config.get("ANIMATIONS", True))
 		self.animation_delay = 0.01
 		self.path_animation_delay = 0.01
 		wrapper(self.__main)
@@ -65,21 +66,17 @@ class GUI:
 		assert isinstance(entry, tuple)
 		assert isinstance(exit_pos, tuple)
 		self.show_path = False
-		maze = self.__generate_maze_with_animation(
+		maze = self.__generate_maze(
 			stdscr,
 			entry,
 			exit_pos
 		)
-		self.ft_pattern = set(where_is_ft_pattern(maze))
-		path = a_star(entry, exit_pos, maze)
-		path_coords, path_edges = self.__path_to_coords_and_edges(path, entry)
-		if self.show_path:
-			path, path_coords, path_edges = self.__animate_search(
-				stdscr,
-				maze,
-				entry,
-				exit_pos
-			)
+		path, path_coords, path_edges = self.__compute_path(
+			stdscr,
+			maze,
+			entry,
+			exit_pos
+		)
 
 		while True:
 			self.__draw_maze(
@@ -95,29 +92,21 @@ class GUI:
 			if key in (ord('q'), ord('Q')):
 				break
 			if key in (ord('r'), ord('R')):
-				maze = self.__generate_maze_with_animation(
+				maze = self.__generate_maze(
 					stdscr,
 					entry,
 					exit_pos
 				)
-				self.ft_pattern = set(where_is_ft_pattern(maze))
-				if self.show_path:
-					path, path_coords, path_edges = self.__animate_search(
-						stdscr,
-						maze,
-						entry,
-						exit_pos
-					)
-				else:
-					path = a_star(entry, exit_pos, maze)
-					path_coords, path_edges = self.__path_to_coords_and_edges(
-						path,
-						entry
-					)
+				path, path_coords, path_edges = self.__compute_path(
+					stdscr,
+					maze,
+					entry,
+					exit_pos
+				)
 			elif key in (ord('p'), ord('P')):
 				self.show_path = not self.show_path
 				if self.show_path:
-					path, path_coords, path_edges = self.__animate_search(
+					path, path_coords, path_edges = self.__compute_path(
 						stdscr,
 						maze,
 						entry,
@@ -163,6 +152,32 @@ class GUI:
 		init_pair(self.empty_pair, COLOR_BLACK, COLOR_BLACK)
 		init_pair(self.search_frontier_pair, COLOR_BLACK, COLOR_CYAN)
 		init_pair(self.search_current_pair, COLOR_BLACK, COLOR_YELLOW)
+
+	def __generate_maze(
+			self,
+			stdscr,
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> list[list[Cell]]:
+		if self.animations_enabled:
+			return self.__generate_maze_with_animation(stdscr, entry, exit_pos)
+		self.ft_pattern = set()
+		maze = generate_dfs(self.config)
+		self.ft_pattern = set(where_is_ft_pattern(maze))
+		return maze
+
+	def __compute_path(
+			self,
+			stdscr,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> tuple[str, set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+		if self.show_path and self.animations_enabled:
+			return self.__animate_search(stdscr, maze, entry, exit_pos)
+		path = a_star(entry, exit_pos, maze)
+		path_coords, path_edges = self.__path_to_coords_and_edges(path, entry)
+		return path, path_coords, path_edges
 
 	def __generate_maze_with_animation(
 			self,

@@ -33,7 +33,8 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
         "ENTRY": tuple[int, int],
         "EXIT": tuple[int, int],
         "OUTPUT_FILE": str,
-        "PERFECT": bool
+        "PERFECT": bool,
+        "ANIMATIONS": bool
     }
 
     line_splitted = line.split("=")
@@ -84,6 +85,8 @@ def parse_config(path: str) \
                 result[line.split("=")[0]] = _get_line_value(line)
             except CommentError:
                 pass
+        if "ANIMATIONS" not in result:
+            result["ANIMATIONS"] = True
         if result["ENTRY"][0] < 0 or \
                 result["ENTRY"][1] < 0 or \
                 result["ENTRY"][0] >= result["WIDTH"] or \
