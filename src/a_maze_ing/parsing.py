@@ -35,7 +35,8 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
         "OUTPUT_FILE": str,
         "PERFECT": bool,
         "ANIMATIONS": bool,
-        "GUI": bool
+        "GUI": bool,
+        "ALGORITHM": str
     }
 
     line_splitted = line.split("=")
@@ -90,6 +91,17 @@ def parse_config(path: str) \
             result["ANIMATIONS"] = True
         if "GUI" not in result:
             result["GUI"] = False
+        if "ALGORITHM" not in result:
+            result["ALGORITHM"] = "DFS"
+        algorithm = result.get("ALGORITHM")
+        if isinstance(algorithm, str):
+            algorithm = algorithm.strip().upper()
+            if algorithm not in ("DFS", "KRUSKAL"):
+                raise ParsingError(
+                    "Invalid ALGORITHM value. Expected DFS or KRUSKAL."
+                )
+            result["ALGORITHM"] = algorithm
+
         if result["ENTRY"][0] < 0 or \
                 result["ENTRY"][1] < 0 or \
                 result["ENTRY"][0] >= result["WIDTH"] or \

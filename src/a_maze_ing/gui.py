@@ -8,6 +8,7 @@ from curses import COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN
 from curses import COLOR_MAGENTA, COLOR_RED, COLOR_WHITE, COLOR_YELLOW
 from src.a_maze_ing.cell import Cell
 from src.a_maze_ing.algorithms.dfs import generate_dfs
+from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.output import write_output_file
@@ -201,7 +202,8 @@ class GUI:
 		if self.animations_enabled:
 			return self.__generate_maze_with_animation(stdscr, entry, exit_pos)
 		self.ft_pattern = set()
-		maze = generate_dfs(self.config)
+		generator = self.__select_generator()
+		maze = generator(self.config)
 		self.ft_pattern = set(where_is_ft_pattern(maze))
 		return maze
 
@@ -225,6 +227,7 @@ class GUI:
 			exit_pos: tuple[int, int]
 	) -> list[list[Cell]]:
 		self.ft_pattern = set()
+		generator = self.__select_generator()
 
 		def on_step(grid: list[list[Cell]]) -> None:
 			if not self.ft_pattern:
@@ -240,7 +243,119 @@ class GUI:
 			)
 			time.sleep(self.animation_delay)
 
-		return generate_dfs(self.config, on_step=on_step)
+		return generator(self.config, on_step=on_step)
+
+	def __select_generator(self):
+		algorithm = self.config.get("ALGORITHM", "DFS")
+		if isinstance(algorithm, str) and algorithm.upper() == "KRUSKAL":
+			return generate_kruskal
+		return generate_dfs
+
+	def __safe_add(self, stdscr, y, x, text, cp):
+		try:
+			stdscr.addstr(y, x, text, cp)
+		except error:
+			pass
+
+	def __apply_color_pairs(self) -> None:
+		init_pair(
+			self.wall_pair,
+			self.wall_colors[self.wall_color_index],
+			COLOR_BLACK
+		)
+		init_pair(self.path_pair, COLOR_BLACK, COLOR_BLUE)
+		init_pair(self.entry_pair, COLOR_BLACK, COLOR_GREEN)
+		init_pair(self.exit_pair, COLOR_BLACK, COLOR_RED)
+		init_pair(
+			self.pattern_pair,
+			self.pattern_colors[self.pattern_color_index],
+			COLOR_WHITE
+		)
+		init_pair(
+			self.pattern_fill_pair,
+			COLOR_BLACK,
+			COLOR_WHITE
+		)
+		init_pair(self.help_pair, COLOR_WHITE, COLOR_BLACK)
+		init_pair(self.empty_pair, COLOR_BLACK, COLOR_BLACK)
+		init_pair(self.search_frontier_pair, COLOR_BLACK, COLOR_CYAN)
+		init_pair(self.search_current_pair, COLOR_BLACK, COLOR_YELLOW)
+
+	def __write_output_file(
+			self,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int],
+			path: str | None = None
+	) -> None:
+		output_file = self.config.get("OUTPUT_FILE")
+		if not isinstance(output_file, str):
+			return
+		try:
+			write_output_file(output_file, maze, entry, exit_pos, path)
+		except OSError:
+			pass
+
+	def __generate_maze(
+			self,
+			stdscr,
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int],
+			seed: int | None = None
+	) -> list[list[Cell]]:
+		if seed is not None:
+			random.seed(seed)
+		if self.animations_enabled:
+			return self.__generate_maze_with_animation(stdscr, entry, exit_pos)
+		self.ft_pattern = set()
+		generator = self.__select_generator()
+		maze = generator(self.config)
+		self.ft_pattern = set(where_is_ft_pattern(maze))
+		return maze
+
+	def __compute_path(
+			self,
+			stdscr,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> tuple[str, set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+		if self.show_path and self.animations_enabled:
+			return self.__animate_search(stdscr, maze, entry, exit_pos)
+		path = a_star(entry, exit_pos, maze)
+		path_coords, path_edges = self.__path_to_coords_and_edges(path, entry)
+		return path, path_coords, path_edges
+
+	def __generate_maze_with_animation(
+			self,
+			stdscr,
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> list[list[Cell]]:
+		self.ft_pattern = set()
+		generator = self.__select_generator()
+
+		def on_step(grid: list[list[Cell]]) -> None:
+			if not self.ft_pattern:
+				self.ft_pattern = set(where_is_ft_pattern(grid))
+			self.__draw_maze(
+				stdscr,
+				grid,
+				entry,
+				exit_pos,
+				set(),
+				{},
+				False
+			)
+			time.sleep(self.animation_delay)
+
+		return generator(self.config, on_step=on_step)
+
+	def __select_generator(self):
+		algorithm = self.config.get("ALGORITHM", "DFS")
+		if isinstance(algorithm, str) and algorithm.upper() == "KRUSKAL":
+			return generate_kruskal
+		return generate_dfs
 
 	def __path_to_coords_and_edges(
 			self,

@@ -10,6 +10,7 @@ from typing import cast
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
+from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.output import write_output_file
 from src.a_maze_ing.parsing import ParsingError
@@ -50,7 +51,12 @@ def main() -> int:
             seed = random.randrange(2**32)
             random.seed(seed)
 
-        maze = generate_dfs(validated_config)
+        algorithm = validated_config.get("ALGORITHM", "DFS")
+        assert isinstance(algorithm, str)
+        if algorithm.upper() == "KRUSKAL":
+            maze = generate_kruskal(validated_config)
+        else:
+            maze = generate_dfs(validated_config)
         ft_pattern = where_is_ft_pattern(maze)
         if validated_config["ENTRY"] in ft_pattern:
             raise ParsingError("Entry overlaps the 42 pattern.")
