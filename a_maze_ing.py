@@ -3,17 +3,16 @@
 from __future__ import annotations
 
 import argparse
+import random
 from pathlib import Path
 from typing import cast
 
-from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
-from src.a_maze_ing.rendering import render_hex
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
+from src.a_maze_ing.output import write_output_file
 from src.a_maze_ing.parsing import ParsingError
-from src.a_maze_ing.gui import GUI
 
 
 def main() -> int:
@@ -44,6 +43,13 @@ def main() -> int:
             config
         )
 
+        gui_enabled = bool(validated_config.get("GUI", False))
+        animations_enabled = bool(validated_config.get("ANIMATIONS", True))
+        seed = None
+        if gui_enabled and animations_enabled:
+            seed = random.randrange(2**32)
+            random.seed(seed)
+
         maze = generate_dfs(validated_config)
         ft_pattern = where_is_ft_pattern(maze)
         if validated_config["ENTRY"] in ft_pattern:
@@ -58,16 +64,13 @@ def main() -> int:
         exit_pos = validated_config["EXIT"]
         assert isinstance(exit_pos, tuple)
 
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(render_hex(maze))
+        write_output_file(output_file, maze, entry, exit_pos)
 
-            f.write("\n\n")
+        if gui_enabled:
+            from src.a_maze_ing.gui import GUI
 
-            f.write(f"{entry[0]},{entry[1]}\n")
-            f.write(f"{exit_pos[0]},{exit_pos[1]}\n")
-            f.write(f"{a_star(entry, exit_pos, maze)}\n")
-        
-        GUI(validated_config)
+            gui_maze = None if animations_enabled else maze
+            GUI(validated_config, maze=gui_maze, seed=seed)
     except OSError as e:
         print(f"Error when writing into file : {e}")
     except Exception as e:

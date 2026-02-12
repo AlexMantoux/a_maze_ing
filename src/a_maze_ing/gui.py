@@ -1,4 +1,5 @@
 import curses
+import random
 import time
 from curses import wrapper, init_pair, init_color, error
 from curses import start_color, color_pair, use_default_colors, curs_set
@@ -9,11 +10,19 @@ from src.a_maze_ing.cell import Cell
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
+from src.a_maze_ing.output import write_output_file
 
 
 class GUI:
-	def __init__(self, config: dict) -> None:
+	def __init__(
+		self,
+		config: dict,
+		maze: list[list[Cell]] | None = None,
+		seed: int | None = None
+	) -> None:
 		self.config = config
+		self.initial_maze = maze
+		self.initial_seed = seed
 		self.animations_enabled = bool(self.config.get("ANIMATIONS", True))
 		self.animation_delay = 0.01
 		self.path_animation_delay = 0.01
@@ -66,11 +75,22 @@ class GUI:
 		assert isinstance(entry, tuple)
 		assert isinstance(exit_pos, tuple)
 		self.show_path = False
-		maze = self.__generate_maze(
-			stdscr,
-			entry,
-			exit_pos
-		)
+		if self.animations_enabled:
+			maze = self.__generate_maze(
+				stdscr,
+				entry,
+				exit_pos,
+				seed=self.initial_seed
+			)
+		elif self.initial_maze is not None:
+			maze = self.initial_maze
+			self.ft_pattern = set(where_is_ft_pattern(maze))
+		else:
+			maze = self.__generate_maze(
+				stdscr,
+				entry,
+				exit_pos
+			)
 		path, path_coords, path_edges = self.__compute_path(
 			stdscr,
 			maze,
@@ -103,6 +123,7 @@ class GUI:
 					entry,
 					exit_pos
 				)
+				self.__write_output_file(maze, entry, exit_pos, path)
 			elif key in (ord('p'), ord('P')):
 				self.show_path = not self.show_path
 				if self.show_path:
@@ -153,12 +174,30 @@ class GUI:
 		init_pair(self.search_frontier_pair, COLOR_BLACK, COLOR_CYAN)
 		init_pair(self.search_current_pair, COLOR_BLACK, COLOR_YELLOW)
 
+	def __write_output_file(
+			self,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int],
+			path: str | None = None
+	) -> None:
+		output_file = self.config.get("OUTPUT_FILE")
+		if not isinstance(output_file, str):
+			return
+		try:
+			write_output_file(output_file, maze, entry, exit_pos, path)
+		except OSError:
+			pass
+
 	def __generate_maze(
 			self,
 			stdscr,
 			entry: tuple[int, int],
-			exit_pos: tuple[int, int]
+			exit_pos: tuple[int, int],
+			seed: int | None = None
 	) -> list[list[Cell]]:
+		if seed is not None:
+			random.seed(seed)
 		if self.animations_enabled:
 			return self.__generate_maze_with_animation(stdscr, entry, exit_pos)
 		self.ft_pattern = set()
