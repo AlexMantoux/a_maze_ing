@@ -34,3 +34,28 @@ class Cell:
             int(self.south) * 2 +
             int(self.west) * 1
         )[2:].upper()
+
+    def to_hex(self) -> str:
+        """Return hexadecimal representation of the cell walls."""
+        return str(self)
+
+    def has_wall(self, direction: str) -> bool:
+        """Check if wall exists in given direction (N/E/S/W)."""
+        return {
+            "N": self.north,
+            "E": self.east,
+            "S": self.south,
+            "W": self.west
+        }[direction.upper()]
+
+    def set_wall(self, direction: str, value: bool) -> None:
+        """Set wall state in given direction (N/E/S/W)."""
+        direction = direction.upper()
+        if direction == "N":
+            self.north = value
+        elif direction == "E":
+            self.east = value
+        elif direction == "S":
+            self.south = value
+        elif direction == "W":
+            self.west = value

@@ -1,0 +1,41 @@
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "A reusable maze generation library supporting DFS and Kruskal algorithms"
+authors = [
+    {name = "trgascoi", email = "trgascoi@student.42lyon.fr"},
+    {name = "amantoux", email = "amantoux@student.42lyon.fr"}
+]
+readme = "README_MAZEGEN.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+keywords = ["maze", "generator", "algorithm", "dfs", "kruskal", "pathfinding"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/42lyon/a_maze_ing"
+Repository = "https://github.com/42lyon/a_maze_ing"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mazegen"]
+package-dir = {"mazegen" = "."}
+
+[tool.setuptools.package-data]
+mazegen = ["py.typed"]

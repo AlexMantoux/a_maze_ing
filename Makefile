@@ -16,10 +16,11 @@ debug:
 	@$(POETRY) run python -m pdb a_maze_ing.py config.txt
 
 clean:
-	@echo "Cleaning temporary files..."
+	@echo "Cleaning temporary files and build artifacts..."
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 	@find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	@find . -type f -name "*.pyc" -delete
+	@rm -rf dist/ build/ *.egg-info mazegen/
 
 lint:
 	@echo "Linting with flake8 and mypy..."
@@ -31,4 +32,21 @@ lint-strict:
 	@$(POETRY) run flake8 $(PY_FILES)
 	@$(POETRY) run mypy $(PY_FILES) --strict
 
-.PHONY: all install run debug clean lint lint-strict
+bundle-mazegen:
+	@echo "Bundling mazegen from source files..."
+	@$(POETRY) run python scripts/bundle_mazegen.py
+
+build-package: bundle-mazegen
+	@echo "Building mazegen package..."
+	@cp mazegen_pyproject.toml mazegen/pyproject.toml
+	@$(POETRY) run python -m build mazegen/
+	@rm mazegen/pyproject.toml
+	@mkdir -p dist
+	@mv mazegen/dist/* dist/ 2>/dev/null || true
+	@rm -rf mazegen/dist
+
+clean-package:
+	@echo "Cleaning package build artifacts..."
+	@rm -rf dist/ build/ *.egg-info mazegen/*.egg-info mazegen/build mazegen/dist
+
+.PHONY: all install run debug clean lint lint-strict bundle-mazegen build-package clean-package
