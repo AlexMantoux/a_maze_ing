@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from src.a_maze_ing.cell import Cell, CellState
 from random import choice as random_choice
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
@@ -64,7 +65,8 @@ def _remove_walls_between(cell1: Cell, cell2: Cell) -> None:
 
 
 def generate_dfs(
-        config: dict[str, int | tuple[int, int] | str | bool]
+        config: dict[str, int | tuple[int, int] | str | bool],
+        on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
     entry = config["ENTRY"]
     assert isinstance(entry, tuple)
@@ -77,6 +79,8 @@ def generate_dfs(
     current = grid[y][x]
     current.state = CellState.VISITED
     stack = [current]
+    if on_step:
+        on_step(grid)
 
     while stack:
         current = stack[-1]
@@ -88,6 +92,8 @@ def generate_dfs(
             _remove_walls_between(current, next_cell)
             next_cell.state = CellState.VISITED
             stack.append(next_cell)
+            if on_step:
+                on_step(grid)
         else:
             stack.pop()
 

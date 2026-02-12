@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from heapq import heappush, heappop
 from src.a_maze_ing.cell import Cell
 
@@ -27,27 +28,57 @@ def _get_accessible_neighbors(
 
 
 def a_star(
-        entry: tuple[int, int], exit: tuple[int, int], grid: list[list[Cell]]
+        entry: tuple[int, int],
+        exit: tuple[int, int],
+        grid: list[list[Cell]],
+        on_step: Callable[
+            [tuple[int, int], set[tuple[int, int]], set[tuple[int, int]], str],
+            None
+        ] | None = None
 ) -> str:
     if not grid or not grid[0]:
         return ""
 
+    def reconstruct_path(
+            came_from: dict[tuple[int, int], tuple[tuple[int, int], str]],
+            current: tuple[int, int]
+    ) -> str:
+        steps: list[str] = []
+        while current in came_from:
+            previous, direction = came_from[current]
+            steps.append(direction)
+            current = previous
+        steps.reverse()
+        return "".join(steps)
+
     counter = 0
-    open_set: list[tuple[int, int, tuple[int, int], str]] = []
-    heappush(open_set, (0, counter, entry, ""))
+    open_set: list[tuple[int, int, tuple[int, int]]] = []
+    heappush(open_set, (0, counter, entry))
+    open_positions = {entry}
 
     g_score = {entry: 0}
+    came_from: dict[tuple[int, int], tuple[tuple[int, int], str]] = {}
 
     closed_set = set()
 
     while open_set:
-        _, _, current_pos, path = heappop(open_set)
-
-        if current_pos == exit:
-            return path
+        _, _, current_pos = heappop(open_set)
 
         if current_pos in closed_set:
             continue
+        open_positions.discard(current_pos)
+        path = reconstruct_path(came_from, current_pos)
+
+        if current_pos == exit:
+            if on_step:
+                on_step(
+                    current_pos,
+                    set(open_positions),
+                    closed_set | {current_pos},
+                    path
+                )
+            return path
+
         closed_set.add(current_pos)
 
         current_x, current_y = current_pos
@@ -66,11 +97,21 @@ def a_star(
             if (neighbor_pos not in g_score or
                     tentative_g < g_score[neighbor_pos]):
                 g_score[neighbor_pos] = tentative_g
+                came_from[neighbor_pos] = (current_pos, direction)
                 f_score = tentative_g + _manhattan_distance(neighbor_pos, exit)
                 counter += 1
                 heappush(
                     open_set,
-                    (f_score, counter, neighbor_pos, path + direction)
+                    (f_score, counter, neighbor_pos)
                 )
+                open_positions.add(neighbor_pos)
+
+        if on_step:
+            on_step(
+                current_pos,
+                set(open_positions),
+                set(closed_set),
+                path
+            )
 
     return ""

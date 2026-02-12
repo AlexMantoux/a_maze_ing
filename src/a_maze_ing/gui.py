@@ -1,4 +1,5 @@
 import curses
+import time
 from curses import wrapper, init_pair, init_color, error
 from curses import start_color, color_pair, use_default_colors, curs_set
 from curses import can_change_color
@@ -13,6 +14,8 @@ from src.a_maze_ing.algorithms.a_star import a_star
 class GUI:
 	def __init__(self, config: dict) -> None:
 		self.config = config
+		self.animation_delay = 0.01
+		self.path_animation_delay = 0.01
 		wrapper(self.__main)
 
 	def __main(self, stdscr):
@@ -51,19 +54,32 @@ class GUI:
 		self.help_pair = 6
 		self.pattern_fill_pair = 7
 		self.empty_pair = 8
+		self.search_frontier_pair = 10
+		self.search_current_pair = 11
 
 		self.__apply_color_pairs()
 		stdscr.bkgd(' ', color_pair(self.empty_pair))
 
-		maze = generate_dfs(self.config)
-		self.ft_pattern = set(where_is_ft_pattern(maze))
-		self.show_path = False
 		entry = self.config.get("ENTRY")
 		exit_pos = self.config.get("EXIT")
 		assert isinstance(entry, tuple)
 		assert isinstance(exit_pos, tuple)
+		self.show_path = False
+		maze = self.__generate_maze_with_animation(
+			stdscr,
+			entry,
+			exit_pos
+		)
+		self.ft_pattern = set(where_is_ft_pattern(maze))
 		path = a_star(entry, exit_pos, maze)
 		path_coords, path_edges = self.__path_to_coords_and_edges(path, entry)
+		if self.show_path:
+			path, path_coords, path_edges = self.__animate_search(
+				stdscr,
+				maze,
+				entry,
+				exit_pos
+			)
 
 		while True:
 			self.__draw_maze(
@@ -79,15 +95,34 @@ class GUI:
 			if key in (ord('q'), ord('Q')):
 				break
 			if key in (ord('r'), ord('R')):
-				maze = generate_dfs(self.config)
-				self.ft_pattern = set(where_is_ft_pattern(maze))
-				path = a_star(entry, exit_pos, maze)
-				path_coords, path_edges = self.__path_to_coords_and_edges(
-					path,
-					entry
+				maze = self.__generate_maze_with_animation(
+					stdscr,
+					entry,
+					exit_pos
 				)
+				self.ft_pattern = set(where_is_ft_pattern(maze))
+				if self.show_path:
+					path, path_coords, path_edges = self.__animate_search(
+						stdscr,
+						maze,
+						entry,
+						exit_pos
+					)
+				else:
+					path = a_star(entry, exit_pos, maze)
+					path_coords, path_edges = self.__path_to_coords_and_edges(
+						path,
+						entry
+					)
 			elif key in (ord('p'), ord('P')):
 				self.show_path = not self.show_path
+				if self.show_path:
+					path, path_coords, path_edges = self.__animate_search(
+						stdscr,
+						maze,
+						entry,
+						exit_pos
+					)
 			elif key in (ord('w'), ord('W')):
 				self.wall_color_index = (
 					self.wall_color_index + 1
@@ -126,6 +161,32 @@ class GUI:
 		)
 		init_pair(self.help_pair, COLOR_WHITE, COLOR_BLACK)
 		init_pair(self.empty_pair, COLOR_BLACK, COLOR_BLACK)
+		init_pair(self.search_frontier_pair, COLOR_BLACK, COLOR_CYAN)
+		init_pair(self.search_current_pair, COLOR_BLACK, COLOR_YELLOW)
+
+	def __generate_maze_with_animation(
+			self,
+			stdscr,
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> list[list[Cell]]:
+		self.ft_pattern = set()
+
+		def on_step(grid: list[list[Cell]]) -> None:
+			if not self.ft_pattern:
+				self.ft_pattern = set(where_is_ft_pattern(grid))
+			self.__draw_maze(
+				stdscr,
+				grid,
+				entry,
+				exit_pos,
+				set(),
+				{},
+				False
+			)
+			time.sleep(self.animation_delay)
+
+		return generate_dfs(self.config, on_step=on_step)
 
 	def __path_to_coords_and_edges(
 			self,
@@ -150,6 +211,78 @@ class GUI:
 			coords.add(end)
 			edges.setdefault(start, set()).add(step)
 			edges.setdefault(end, set()).add(opposites[step])
+		return coords, edges
+
+	def __animate_search(
+			self,
+			stdscr,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int]
+	) -> tuple[str, set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+		def on_step(
+				current: tuple[int, int],
+				open_set: set[tuple[int, int]],
+				closed_set: set[tuple[int, int]],
+				path: str
+		) -> None:
+			path_coords, path_edges = self.__path_to_coords_and_edges(
+				path,
+				entry
+			)
+			self.__draw_maze(
+				stdscr,
+				maze,
+				entry,
+				exit_pos,
+				path_coords,
+				path_edges,
+				True,
+				search_frontier=open_set,
+				search_current=current
+			)
+			time.sleep(self.path_animation_delay)
+
+		path = a_star(entry, exit_pos, maze, on_step=on_step)
+		path_coords, path_edges = self.__path_to_coords_and_edges(path, entry)
+		return path, path_coords, path_edges
+
+	def __animate_path(
+			self,
+			stdscr,
+			maze: list[list[Cell]],
+			entry: tuple[int, int],
+			exit_pos: tuple[int, int],
+			path: str
+	) -> tuple[set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+		x, y = entry
+		coords: set[tuple[int, int]] = set()
+		edges: dict[tuple[int, int], set[str]] = {}
+		opposites = {"N": "S", "S": "N", "E": "W", "W": "E"}
+		for step in path:
+			start = (x, y)
+			if step == 'N':
+				y -= 1
+			elif step == 'S':
+				y += 1
+			elif step == 'W':
+				x -= 1
+			elif step == 'E':
+				x += 1
+			end = (x, y)
+			coords.add(end)
+			edges.setdefault(start, set()).add(step)
+			edges.setdefault(end, set()).add(opposites[step])
+			self.__draw_maze(
+				stdscr,
+				maze,
+				entry,
+				exit_pos,
+				coords,
+				edges,
+				True
+			)
+			time.sleep(self.path_animation_delay)
 		return coords, edges
 
 	def __is_pattern_wall(self, x: int, y: int, direction: str) -> bool:
@@ -189,7 +322,7 @@ class GUI:
 	def __draw_help(self, stdscr, rows: int) -> None:
 		help_y = rows * 2 + 2
 		help_text = (
-			"r: new maze  p: toggle path  w: wall color  "
+			"r: new maze  p: toggle search/path  w: wall color  "
 			"f: 42 color  q: quit"
 		)
 		self.__safe_add(stdscr, help_y, 0, help_text, color_pair(self.help_pair))
@@ -202,9 +335,12 @@ class GUI:
 			exit_pos: tuple[int, int],
 			path_coords: set[tuple[int, int]],
 			path_edges: dict[tuple[int, int], set[str]],
-			show_path: bool
+			show_path: bool,
+			search_frontier: set[tuple[int, int]] | None = None,
+			search_current: tuple[int, int] | None = None
 	) -> None:
 		stdscr.clear()
+		search_frontier = search_frontier or set()
 		rows = len(maze)
 		cols = len(maze[0]) if rows > 0 else 0
 
@@ -220,7 +356,9 @@ class GUI:
 					entry,
 					exit_pos,
 					path_coords if show_path else set(),
-					path_edges if show_path else {}
+					path_edges if show_path else {},
+					search_frontier,
+					search_current
 				)
 
 		self.__draw_help(stdscr, rows)
@@ -237,11 +375,14 @@ class GUI:
 			entry: tuple[int, int],
 			exit_pos: tuple[int, int],
 			path_coords: set[tuple[int, int]],
-			path_edges: dict[tuple[int, int], set[str]]
+			path_edges: dict[tuple[int, int], set[str]],
+			search_frontier: set[tuple[int, int]],
+			search_current: tuple[int, int] | None
 	):
 		yy, xx = y * 2, x * 4
 		is_pattern = (x, y) in self.ft_pattern
 		edge_dirs = path_edges.get((x, y), set())
+		is_search_current = search_current == (x, y)
 
 		# Top-left corner of the cell
 		wall_cp_tl = (
@@ -294,6 +435,12 @@ class GUI:
 		elif (x, y) in path_coords:
 			content = "   "
 			content_cp = color_pair(self.path_pair)
+		elif is_search_current:
+			content = "   "
+			content_cp = color_pair(self.search_current_pair)
+		elif (x, y) in search_frontier:
+			content = "   "
+			content_cp = color_pair(self.search_frontier_pair)
 		else:
 			content = "   "
 			if is_pattern:
