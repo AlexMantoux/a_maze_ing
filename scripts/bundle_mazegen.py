@@ -62,27 +62,27 @@ def is_internal_import(line: str) -> bool:
 
 def extract_code_parts(content: str) -> tuple[list[str], str]:
     """Extract stdlib imports and code body from a file.
-    
+
     Returns:
         (stdlib_imports, code_body_without_internal_imports)
     """
     lines = content.split('\n')
     stdlib_imports: list[str] = []
     code_lines: list[str] = []
-    
+
     in_docstring = False
     docstring_char = None
     at_start = True
-    
+
     for line in lines:
         stripped = line.strip()
-        
+
         # Check if we're in a docstring first (higher priority)
         if in_docstring:
             if docstring_char and docstring_char in stripped:
                 in_docstring = False
             continue
-        
+
         # Handle module-level docstrings at the start (skip them)
         if at_start and stripped.startswith(('"""', "'''")):
             docstring_char = stripped[:3]
@@ -90,11 +90,11 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
                 continue
             in_docstring = True
             continue
-        
+
         # After docstring, we're no longer at the start
         if stripped and not stripped.startswith('#'):
             at_start = False
-        
+
         # Categorize lines
         if stripped.startswith(('import ', 'from ')):
             if is_internal_import(stripped):
@@ -107,10 +107,10 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
                 code_lines.append(line)
         else:
             code_lines.append(line)
-    
+
     # Clean up leading/trailing empty lines
     code = '\n'.join(code_lines).strip()
-    
+
     return stdlib_imports, code
 
 
@@ -125,7 +125,7 @@ def bundle_cell() -> None:
     """Bundle cell.py from source."""
     src_cell = SRC_DIR / "cell.py"
     content = read_and_process(src_cell)
-    
+
     docstring = '''"""Cell module for maze representation.
 
 This module defines the Cell class and CellState enum used to represent
@@ -134,9 +134,9 @@ individual cells within a maze.
 This file is auto-generated from src/a_maze_ing sources.
 Do not edit directly - modify the source files instead.
 """'''
-    
+
     content = add_docstring_if_missing(content, docstring)
-    
+
     dest = MAZEGEN_DIR / "cell.py"
     dest.write_text(content)
     print(f"  Generated {dest.relative_to(ROOT)}")
@@ -150,35 +150,50 @@ def read_and_process(path: Path) -> str:
 
 def bundle_generator() -> None:
     """Bundle generator.py by combining algorithm sources."""
-    
+
     # Read all algorithm files
     dfs_src = SRC_DIR / "algorithms" / "dfs.py"
     kruskal_src = SRC_DIR / "algorithms" / "kruskal.py"
     a_star_src = SRC_DIR / "algorithms" / "a_star.py"
     ft_pattern_src = SRC_DIR / "algorithms" / "ft_pattern.py"
     wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py"
-    
+
     # Extract code from each file
     dfs_imports, dfs_code = extract_code_parts(read_and_process(dfs_src))
-    kruskal_imports, kruskal_code = extract_code_parts(read_and_process(kruskal_src))
-    a_star_imports, a_star_code = extract_code_parts(read_and_process(a_star_src))
-    ft_imports, ft_code = extract_code_parts(read_and_process(ft_pattern_src))
-    wrapper_imports, wrapper_code = extract_code_parts(read_and_process(wrapper_src))
-    
+    kruskal_imports, kruskal_code = extract_code_parts(
+        read_and_process(kruskal_src)
+    )
+    a_star_imports, a_star_code = extract_code_parts(
+        read_and_process(a_star_src)
+    )
+    ft_imports, ft_code = extract_code_parts(
+        read_and_process(ft_pattern_src)
+    )
+    wrapper_imports, wrapper_code = extract_code_parts(
+        read_and_process(wrapper_src)
+    )
+
     # Merge all stdlib imports (deduplicated)
     all_imports = set()
-    for imp_list in [dfs_imports, kruskal_imports, a_star_imports, 
-                     ft_imports, wrapper_imports]:
+    for imp_list in [
+        dfs_imports,
+        kruskal_imports,
+        a_star_imports,
+        ft_imports,
+        wrapper_imports
+    ]:
         all_imports.update(imp_list)
-    
+
     # Sort imports nicely
     from_future = [i for i in all_imports if "from __future__" in i]
     regular_imports = [i for i in all_imports if i.startswith("import ")]
-    from_imports = [i for i in all_imports 
+    from_imports = [i for i in all_imports
                     if i.startswith("from ") and "from __future__" not in i]
-    
-    sorted_imports = from_future + sorted(regular_imports) + sorted(from_imports)
-    
+
+    sorted_imports = from_future
+    + sorted(regular_imports)
+    + sorted(from_imports)
+
     # Build the combined file
     header = '''"""Maze Generator module.
 
@@ -190,10 +205,10 @@ Do not edit directly - modify the source files instead.
 """
 
 '''
-    
+
     imports_section = '\n'.join(sorted_imports)
     internal_import = "\nfrom mazegen.cell import Cell, CellState\n"
-    
+
     # Combine all code sections
     combined_code = f"""
 
@@ -234,10 +249,10 @@ Do not edit directly - modify the source files instead.
 
     # Write the combined file
     full_content = header + imports_section + internal_import + combined_code
-    
+
     # Clean up multiple blank lines
     full_content = re.sub(r'\n{3,}', '\n\n\n', full_content)
-    
+
     dest = MAZEGEN_DIR / "generator.py"
     dest.write_text(full_content)
     print(f"  Generated {dest.relative_to(ROOT)}")
@@ -247,7 +262,7 @@ def bundle_init() -> None:
     """Generate __init__.py for mazegen package."""
     init_src = MAZEGEN_SRC_DIR / "__init__.py"
     content = read_and_process(init_src)
-    
+
     dest = MAZEGEN_DIR / "__init__.py"
     dest.write_text(content)
     print(f"  Generated {dest.relative_to(ROOT)}")
