@@ -102,11 +102,14 @@ def _remove_walls_toward(
 
 def flaw_maze(maze: list[list[Cell]]) -> None:
     walls_to_break: int = len(maze) * len(maze[0]) // 7
+    iterations_remaining: int = 1500
 
-    while walls_to_break > 0:
+    while walls_to_break > 0 and iterations_remaining > 0:
         rd_cell: Cell = random_choice(random_choice(maze))
         rd_direction = random_choice(list(CardinalPoint))
 
         if _wall_breakable_toward(maze, rd_cell, rd_direction):
             _remove_walls_toward(maze, rd_cell, rd_direction)
             walls_to_break -= 1
+        
+        iterations_remaining -= 1
