@@ -46,10 +46,8 @@ def main() -> int:
 
         gui_enabled = bool(validated_config.get("GUI", False))
         animations_enabled = bool(validated_config.get("ANIMATIONS", True))
-        seed = None
-        if gui_enabled and animations_enabled:
-            seed = random.randrange(2**32)
-            random.seed(seed)
+        seed = int(validated_config.get("SEED", random.randrange(2**32)))
+        random.seed(seed)
 
         algorithm = validated_config.get("ALGORITHM", "DFS")
         assert isinstance(algorithm, str)

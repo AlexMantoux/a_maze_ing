@@ -36,7 +36,8 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
         "PERFECT": bool,
         "ANIMATIONS": bool,
         "GUI": bool,
-        "ALGORITHM": str
+        "ALGORITHM": str,
+        "SEED": int
     }
 
     line_splitted = line.split("=")
@@ -102,6 +103,8 @@ def parse_config(path: str) \
                 )
             result["ALGORITHM"] = algorithm
 
+        if result["ENTRY"] == result["EXIT"]:
+            raise ParsingError("Entry and exit are in the same place.")
         if result["ENTRY"][0] < 0 or \
                 result["ENTRY"][1] < 0 or \
                 result["ENTRY"][0] >= result["WIDTH"] or \
