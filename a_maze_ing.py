@@ -14,6 +14,7 @@ from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.output import write_output_file
 from src.a_maze_ing.parsing import ParsingError
+from src.a_maze_ing.flaw import flaw_maze
 
 
 def main() -> int:
@@ -68,6 +69,8 @@ def main() -> int:
         exit_pos = validated_config["EXIT"]
         assert isinstance(exit_pos, tuple)
 
+        if not bool(validated_config.get("PERFECT", True)):
+            flaw_maze(maze)
         write_output_file(output_file, maze, entry, exit_pos)
 
         if gui_enabled:
