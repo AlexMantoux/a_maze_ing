@@ -12,6 +12,7 @@ from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.output import write_output_file
+from typing import Callable
 
 
 class GUI:
@@ -29,7 +30,7 @@ class GUI:
         self.path_animation_delay = 0.01
         wrapper(self.__main)
 
-    def __main(self, stdscr):
+    def __main(self, stdscr: curses.window) -> None:
         start_color()
         use_default_colors()
         self.gray_bg = COLOR_BLACK
@@ -145,7 +146,14 @@ class GUI:
                 ) % len(self.pattern_colors)
                 self.__apply_color_pairs()
 
-    def __safe_add(self, stdscr, y, x, text, cp):
+    def __safe_add(
+        self,
+        stdscr: curses.window,
+        y: int,
+        x: int,
+        text: str,
+        cp: int
+    ) -> None:
         try:
             stdscr.addstr(y, x, text, cp)
         except error:
@@ -192,7 +200,7 @@ class GUI:
 
     def __generate_maze(
             self,
-            stdscr,
+            stdscr: curses.window,
             entry: tuple[int, int],
             exit_pos: tuple[int, int],
             seed: int | None = None
@@ -201,15 +209,14 @@ class GUI:
             random.seed(seed)
         if self.animations_enabled:
             return self.__generate_maze_with_animation(stdscr, entry, exit_pos)
-        self.ft_pattern = set()
         generator = self.__select_generator()
-        maze = generator(self.config)
+        maze: list[list[Cell]] = generator(self.config)
         self.ft_pattern = set(where_is_ft_pattern(maze))
         return maze
 
     def __compute_path(
             self,
-            stdscr,
+            stdscr: curses.window,
             maze: list[list[Cell]],
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
@@ -222,7 +229,7 @@ class GUI:
 
     def __generate_maze_with_animation(
             self,
-            stdscr,
+            stdscr: curses.window,
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
     ) -> list[list[Cell]]:
@@ -243,9 +250,12 @@ class GUI:
             )
             time.sleep(self.animation_delay)
 
-        return generator(self.config, on_step=on_step)
+        maze: list[list[Cell]] = generator(self.config, on_step=on_step)
+        return maze
 
-    def __select_generator(self):
+    def __select_generator(
+        self,
+    ) -> Callable[..., list[list[Cell]]]:
         algorithm = self.config.get("ALGORITHM", "DFS")
         if isinstance(algorithm, str) and algorithm.upper() == "KRUSKAL":
             return generate_kruskal
@@ -278,7 +288,7 @@ class GUI:
 
     def __animate_search(
             self,
-            stdscr,
+            stdscr: curses.window,
             maze: list[list[Cell]],
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
@@ -312,7 +322,7 @@ class GUI:
 
     def __animate_path(
             self,
-            stdscr,
+            stdscr: curses.window,
             maze: list[list[Cell]],
             entry: tuple[int, int],
             exit_pos: tuple[int, int],
@@ -382,7 +392,7 @@ class GUI:
                 return True
         return False
 
-    def __draw_help(self, stdscr, rows: int) -> None:
+    def __draw_help(self, stdscr: curses.window, rows: int) -> None:
         help_y = rows * 2 + 2
         help_text = (
             "r: new maze  p: toggle search/path  w: wall color  "
@@ -398,7 +408,7 @@ class GUI:
 
     def __draw_maze(
             self,
-            stdscr,
+            stdscr: curses.window,
             maze: list[list[Cell]],
             entry: tuple[int, int],
             exit_pos: tuple[int, int],
@@ -435,19 +445,19 @@ class GUI:
 
     def __draw_cell_structured(
             self,
-            stdscr,
-            x,
-            y,
+            stdscr: curses.window,
+            x: int,
+            y: int,
             cell: Cell,
-            max_y,
-            max_x,
+            max_y: int,
+            max_x: int,
             entry: tuple[int, int],
             exit_pos: tuple[int, int],
             path_coords: set[tuple[int, int]],
             path_edges: dict[tuple[int, int], set[str]],
             search_frontier: set[tuple[int, int]],
             search_current: tuple[int, int] | None
-    ):
+    ) -> None:
         yy, xx = y * 2, x * 4
         is_pattern = (x, y) in self.ft_pattern
         edge_dirs = path_edges.get((x, y), set())

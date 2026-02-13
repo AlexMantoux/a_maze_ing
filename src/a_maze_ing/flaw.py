@@ -100,7 +100,7 @@ def _remove_walls_toward(
                 grid[y][x - 1].east = False
 
 
-def flaw_maze(maze: list[list[Cell]]):
+def flaw_maze(maze: list[list[Cell]]) -> None:
     walls_to_break: int = len(maze) * len(maze[0]) // 7
 
     while walls_to_break > 0:

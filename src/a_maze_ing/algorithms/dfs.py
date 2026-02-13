@@ -65,7 +65,7 @@ def _remove_walls_between(cell1: Cell, cell2: Cell) -> None:
 
 
 def generate_dfs(
-        config: dict[str, int | tuple[int, int] | str | bool],
+        config: dict[str, object],
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
     entry = config["ENTRY"]

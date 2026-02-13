@@ -94,7 +94,7 @@ def _get_edges(grid: list[list[Cell]]) -> list[tuple[Cell, Cell]]:
 
 
 def generate_kruskal(
-        config: dict[str, int | tuple[int, int] | str | bool],
+        config: dict[str, object],
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
     width = config["WIDTH"]

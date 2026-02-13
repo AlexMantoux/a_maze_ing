@@ -1,12 +1,9 @@
 """Entry point for the A-Maze-ing project."""
-
 from __future__ import annotations
-
 import argparse
 import random
 from pathlib import Path
-from typing import cast
-
+from typing import Mapping, cast
 from src.a_maze_ing.parsing import check_config_mandatory
 from src.a_maze_ing.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
@@ -15,6 +12,10 @@ from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.output import write_output_file
 from src.a_maze_ing.parsing import ParsingError
 from src.a_maze_ing.flaw import flaw_maze
+
+# Covariant Mapping avoids the dict-invariance errors when passing to
+# generator functions whose signatures use a wider or narrower value type.
+MazeConfig = Mapping[str, int | tuple[int, int] | str | bool]
 
 
 def main() -> int:
@@ -30,24 +31,23 @@ def main() -> int:
         print("No config file provided. "
               "Usage: python a_maze_ing.py [CONFIG_FILE].")
         return 1
-
     config_path = Path(args.config)
     if not config_path.exists():
         print(f"Config file not found: {config_path}")
         return 1
-
     try:
         config = parse_config(str(config_path))
         check_config_mandatory(config)
-        # After validation, we know all required values are present and valid
-        validated_config = cast(
-            dict[str, int | tuple[int, int] | str | bool],
-            config
-        )
+        # After validation, we know all required values are present and valid.
+        validated_config: MazeConfig = cast(MazeConfig, config)
 
         gui_enabled = bool(validated_config.get("GUI", False))
         animations_enabled = bool(validated_config.get("ANIMATIONS", True))
-        seed = int(validated_config.get("SEED", random.randrange(2**32)))
+
+        # Narrow SEED to int before passing to int() / random.seed().
+        raw_seed = validated_config.get("SEED", random.randrange(2**32))
+        seed: int = raw_seed if isinstance(raw_seed, int) \
+            else random.randrange(2**32)
         random.seed(seed)
 
         algorithm = validated_config.get("ALGORITHM", "DFS")
@@ -56,6 +56,7 @@ def main() -> int:
             maze = generate_kruskal(validated_config)
         else:
             maze = generate_dfs(validated_config)
+
         ft_pattern = where_is_ft_pattern(maze)
         if validated_config["ENTRY"] in ft_pattern:
             raise ParsingError("Entry overlaps the 42 pattern.")
@@ -75,7 +76,6 @@ def main() -> int:
 
         if gui_enabled:
             from src.a_maze_ing.gui import GUI
-
             gui_maze = None if animations_enabled else maze
             GUI(validated_config, maze=gui_maze, seed=seed)
     except OSError as e:
@@ -83,7 +83,6 @@ def main() -> int:
     except Exception as e:
         print(e)
         return 1
-
     return 0
 
 

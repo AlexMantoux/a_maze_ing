@@ -59,7 +59,7 @@ def a_star(
     g_score = {entry: 0}
     came_from: dict[tuple[int, int], tuple[tuple[int, int], str]] = {}
 
-    closed_set = set()
+    closed_set: set[tuple[int, int]] = set()
 
     while open_set:
         _, _, current_pos = heappop(open_set)

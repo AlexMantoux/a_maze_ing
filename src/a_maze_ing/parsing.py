@@ -103,17 +103,31 @@ def parse_config(path: str) \
                 )
             result["ALGORITHM"] = algorithm
 
-        if result["ENTRY"] == result["EXIT"]:
+        entry = result.get("ENTRY")
+        exit_ = result.get("EXIT")
+        width = result.get("WIDTH")
+        height = result.get("HEIGHT")
+
+        if not isinstance(entry, tuple):
+            raise ParsingError("Invalid or missing ENTRY value.")
+        if not isinstance(exit_, tuple):
+            raise ParsingError("Invalid or missing EXIT value.")
+        if not isinstance(width, int):
+            raise ParsingError("Invalid or missing WIDTH value.")
+        if not isinstance(height, int):
+            raise ParsingError("Invalid or missing HEIGHT value.")
+
+        if entry == exit_:
             raise ParsingError("Entry and exit are in the same place.")
-        if result["ENTRY"][0] < 0 or \
-                result["ENTRY"][1] < 0 or \
-                result["ENTRY"][0] >= result["WIDTH"] or \
-                result["ENTRY"][1] >= result["HEIGHT"]:
+        if entry[0] < 0 or \
+                entry[1] < 0 or \
+                entry[0] >= width or \
+                entry[1] >= height:
             raise ParsingError("Entry is out of the grid.")
-        if result["EXIT"][0] < 0 or \
-                result["EXIT"][1] < 0 or \
-                result["EXIT"][0] >= result["WIDTH"] or \
-                result["EXIT"][1] >= result["HEIGHT"]:
+        if exit_[0] < 0 or \
+                exit_[1] < 0 or \
+                exit_[0] >= width or \
+                exit_[1] >= height:
             raise ParsingError("Exit is out of the grid.")
         return result
 

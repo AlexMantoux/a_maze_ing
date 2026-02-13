@@ -190,9 +190,9 @@ def bundle_generator() -> None:
     from_imports = [i for i in all_imports
                     if i.startswith("from ") and "from __future__" not in i]
 
-    sorted_imports = from_future
-    + sorted(regular_imports)
-    + sorted(from_imports)
+    sorted_imports = (from_future
+                      + sorted(regular_imports)
+                      + sorted(from_imports))
 
     # Build the combined file
     header = '''"""Maze Generator module.
