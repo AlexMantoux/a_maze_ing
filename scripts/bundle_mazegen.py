@@ -274,6 +274,18 @@ def bundle_py_typed() -> None:
     dest.write_text("")
     print(f"  Generated {dest.relative_to(ROOT)}")
 
+def bundle_readme() -> None:
+    """Copy README for the mazegen package."""
+    src = MAZEGEN_SRC_DIR / "README.md"
+    if not src.exists():
+        raise FileNotFoundError(
+            f"Missing {src.relative_to(ROOT)}. "
+            "Please add a short README for the mazegen package."
+        )
+    dest = MAZEGEN_DIR / "README.md"
+    dest.write_text(src.read_text())
+    print(f"  Generated {dest.relative_to(ROOT)}")
+
 
 def main() -> None:
     """Main entry point for bundling."""
@@ -288,6 +300,7 @@ def main() -> None:
     bundle_generator()
     bundle_init()
     bundle_py_typed()
+    bundle_readme()
 
     print()
     print("Done! mazegen package has been generated.")

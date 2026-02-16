@@ -15,7 +15,7 @@ debug:
 	@echo "Running in debug mode..."
 	@$(POETRY) run python -m pdb a_maze_ing.py config.txt
 
-clean:
+clean: clean-package
 	@echo "Cleaning temporary files and build artifacts..."
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 	@find . -type d -name ".mypy_cache" -exec rm -rf {} +
@@ -41,12 +41,12 @@ build-package: bundle-mazegen
 	@cp mazegen_pyproject.toml mazegen/pyproject.toml
 	@$(POETRY) run python -m build mazegen/
 	@rm mazegen/pyproject.toml
-	@mkdir -p dist
-	@mv mazegen/dist/* dist/ 2>/dev/null || true
+	@mv mazegen/dist/* ./ 2>/dev/null || true
 	@rm -rf mazegen/dist
 
 clean-package:
 	@echo "Cleaning package build artifacts..."
 	@rm -rf dist/ build/ *.egg-info mazegen/*.egg-info mazegen/build mazegen/dist
+	@rm -f mazegen-*.whl mazegen-*.tar.gz
 
 .PHONY: all install run debug clean lint lint-strict bundle-mazegen build-package clean-package
