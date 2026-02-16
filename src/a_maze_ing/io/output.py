@@ -1,6 +1,6 @@
 from src.a_maze_ing.algorithms.a_star import a_star
-from src.a_maze_ing.cell import Cell
-from src.a_maze_ing.rendering import render_hex
+from src.a_maze_ing.core.cell import Cell
+from src.a_maze_ing.io.rendering import render_hex
 
 
 def write_output_file(

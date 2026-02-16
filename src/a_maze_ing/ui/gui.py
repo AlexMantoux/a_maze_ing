@@ -6,14 +6,14 @@ from curses import start_color, color_pair, use_default_colors, curs_set
 from curses import can_change_color
 from curses import COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN
 from curses import COLOR_MAGENTA, COLOR_RED, COLOR_WHITE, COLOR_YELLOW
-from src.a_maze_ing.cell import Cell
+from src.a_maze_ing.core.cell import Cell
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.wilson import generate_wilson
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
-from src.a_maze_ing.output import write_output_file
-from src.a_maze_ing.flaw import flaw_maze
+from src.a_maze_ing.io.output import write_output_file
+from src.a_maze_ing.maze.flaw import flaw_maze
 from typing import Callable
 
 

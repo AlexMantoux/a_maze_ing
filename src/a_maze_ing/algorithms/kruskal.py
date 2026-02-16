@@ -1,46 +1,10 @@
 from collections.abc import Callable
 from random import shuffle as random_shuffle
-from src.a_maze_ing.cell import Cell, CellState
-from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
-
-
-def _generate_full_grid(width: int, height: int) -> list[list[Cell]]:
-    grid = [
-        [
-            Cell(
-                CellState.UNVISITED,
-                True, True, True, True,
-                (x, y)
-            ) for x in range(width)
-        ] for y in range(height)
-    ]
-    for x, y in where_is_ft_pattern(grid):
-        grid[y][x].state = CellState.VISITED
-    return grid
-
-
-def _remove_walls_between(cell1: Cell, cell2: Cell) -> None:
-    """
-    Removes the walls between two adjacent cells.
-    """
-    x1, y1 = cell1.coordinates
-    x2, y2 = cell2.coordinates
-
-    if x1 == x2:
-        if y2 < y1:
-            cell1.north = False
-            cell2.south = False
-        else:
-            cell1.south = False
-            cell2.north = False
-
-    elif y1 == y2:
-        if x2 < x1:
-            cell1.west = False
-            cell2.east = False
-        else:
-            cell1.east = False
-            cell2.west = False
+from src.a_maze_ing.core.cell import Cell, CellState
+from src.a_maze_ing.algorithms.grid_utils import (
+    generate_full_grid,
+    remove_walls_between
+)
 
 
 class _DisjointSet:
@@ -102,7 +66,7 @@ def generate_kruskal(
     assert isinstance(width, int)
     assert isinstance(height, int)
 
-    grid = _generate_full_grid(width, height)
+    grid, _ = generate_full_grid(width, height)
     edges = _get_edges(grid)
     random_shuffle(edges)
 
@@ -119,7 +83,7 @@ def generate_kruskal(
 
     for cell1, cell2 in edges:
         if disjoint_set.union(cell1.coordinates, cell2.coordinates):
-            _remove_walls_between(cell1, cell2)
+            remove_walls_between(cell1, cell2)
             if on_step:
                 on_step(grid)
 

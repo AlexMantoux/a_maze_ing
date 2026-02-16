@@ -1,6 +1,6 @@
 """ASCII rendering for mazes."""
 
-from src.a_maze_ing.cell import Cell
+from src.a_maze_ing.core.cell import Cell
 
 # ANSI color codes
 COLOR_GREEN = "\033[92m"

@@ -6,7 +6,7 @@ This module provides the main MazeGenerator class that wraps all algorithms.
 from collections.abc import Callable
 import random
 
-from src.a_maze_ing.cell import Cell
+from src.a_maze_ing.core.cell import Cell
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.a_star import a_star

@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from src.a_maze_ing.cell import Cell
+from src.a_maze_ing.core.cell import Cell
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from random import choice as random_choice
 from enum import Enum, auto

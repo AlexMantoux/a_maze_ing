@@ -4,15 +4,15 @@ import argparse
 import random
 from pathlib import Path
 from typing import Mapping, cast
-from src.a_maze_ing.parsing import check_config_mandatory
-from src.a_maze_ing.parsing import parse_config
+from src.a_maze_ing.core.parsing import check_config_mandatory
+from src.a_maze_ing.core.parsing import parse_config
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.wilson import generate_wilson
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
-from src.a_maze_ing.output import write_output_file
-from src.a_maze_ing.parsing import ParsingError
-from src.a_maze_ing.flaw import flaw_maze
+from src.a_maze_ing.io.output import write_output_file
+from src.a_maze_ing.core.parsing import ParsingError
+from src.a_maze_ing.maze.flaw import flaw_maze
 
 # Covariant Mapping avoids the dict-invariance errors when passing to
 # generator functions whose signatures use a wider or narrower value type.
@@ -78,7 +78,7 @@ def main() -> int:
         write_output_file(output_file, maze, entry, exit_pos)
 
         if gui_enabled:
-            from src.a_maze_ing.gui import GUI
+            from src.a_maze_ing.ui.gui import GUI
             gui_maze = None if animations_enabled else maze
             GUI(validated_config, maze=gui_maze, seed=seed)
     except OSError as e:

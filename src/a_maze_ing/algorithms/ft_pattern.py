@@ -1,5 +1,4 @@
-from src.a_maze_ing.cell import Cell
-from src.a_maze_ing.parsing import ParsingError
+from src.a_maze_ing.core.cell import Cell
 
 _FT_PATTERN = [
     [1, 0, 0, 0, 1, 1, 1],

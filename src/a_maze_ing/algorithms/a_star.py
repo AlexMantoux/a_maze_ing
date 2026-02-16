@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from heapq import heappush, heappop
-from src.a_maze_ing.cell import Cell
+from src.a_maze_ing.core.cell import Cell
 
 
 def _manhattan_distance(pos: tuple[int, int], goal: tuple[int, int]) -> int:

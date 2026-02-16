@@ -123,7 +123,7 @@ def add_docstring_if_missing(content: str, docstring: str) -> str:
 
 def bundle_cell() -> None:
     """Bundle cell.py from source."""
-    src_cell = SRC_DIR / "cell.py"
+    src_cell = SRC_DIR / "core" / "cell.py"
     content = read_and_process(src_cell)
 
     docstring = '''"""Cell module for maze representation.
@@ -157,6 +157,7 @@ def bundle_generator() -> None:
     wilson_src = SRC_DIR / "algorithms" / "wilson.py"
     a_star_src = SRC_DIR / "algorithms" / "a_star.py"
     ft_pattern_src = SRC_DIR / "algorithms" / "ft_pattern.py"
+    grid_utils_src = SRC_DIR / "algorithms" / "grid_utils.py"
     wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py"
 
     # Extract code from each file
@@ -173,6 +174,9 @@ def bundle_generator() -> None:
     ft_imports, ft_code = extract_code_parts(
         read_and_process(ft_pattern_src)
     )
+    grid_utils_imports, grid_utils_code = extract_code_parts(
+        read_and_process(grid_utils_src)
+    )
     wrapper_imports, wrapper_code = extract_code_parts(
         read_and_process(wrapper_src)
     )
@@ -185,6 +189,7 @@ def bundle_generator() -> None:
         wilson_imports,
         a_star_imports,
         ft_imports,
+        grid_utils_imports,
         wrapper_imports
     ]:
         all_imports.update(imp_list)
@@ -222,6 +227,13 @@ Do not edit directly - modify the source files instead.
 # =============================================================================
 
 {ft_code}
+
+
+# =============================================================================
+# Grid Helpers (from algorithms/grid_utils.py)
+# =============================================================================
+
+{grid_utils_code}
 
 
 # =============================================================================
