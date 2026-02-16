@@ -32,6 +32,10 @@ lint-strict:
 	@$(POETRY) run flake8 $(PY_FILES)
 	@$(POETRY) run mypy $(PY_FILES) --strict
 
+test:
+	@echo "Running tests with pytest..."
+	@$(POETRY) run pytest -q
+
 bundle-mazegen:
 	@echo "Bundling mazegen from source files..."
 	@$(POETRY) run python scripts/bundle_mazegen.py
@@ -49,4 +53,4 @@ clean-package:
 	@rm -rf dist/ build/ *.egg-info mazegen/*.egg-info mazegen/build mazegen/dist
 	@rm -f mazegen-*.whl mazegen-*.tar.gz
 
-.PHONY: all install run debug clean lint lint-strict bundle-mazegen build-package clean-package
+.PHONY: all install run debug clean lint lint-strict test bundle-mazegen build-package clean-package
