@@ -12,6 +12,7 @@ from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.output import write_output_file
+from src.a_maze_ing.flaw import flaw_maze
 from typing import Callable
 
 
@@ -212,6 +213,8 @@ class GUI:
         generator = self.__select_generator()
         maze: list[list[Cell]] = generator(self.config)
         self.ft_pattern = set(where_is_ft_pattern(maze))
+        if not bool(self.config.get("PERFECT", True)):
+            flaw_maze(maze)
         return maze
 
     def __compute_path(
@@ -251,6 +254,8 @@ class GUI:
             time.sleep(self.animation_delay)
 
         maze: list[list[Cell]] = generator(self.config, on_step=on_step)
+        if not bool(self.config.get("PERFECT", True)):
+            flaw_maze(maze, on_step=on_step)
         return maze
 
     def __select_generator(

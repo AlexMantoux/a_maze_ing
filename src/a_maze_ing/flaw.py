@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from src.a_maze_ing.cell import Cell
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from random import choice as random_choice
@@ -100,7 +101,10 @@ def _remove_walls_toward(
                 grid[y][x - 1].east = False
 
 
-def flaw_maze(maze: list[list[Cell]]) -> None:
+def flaw_maze(
+    maze: list[list[Cell]],
+    on_step: Callable[[list[list[Cell]]], None] | None = None
+) -> None:
     walls_to_break: int = len(maze) * len(maze[0]) // 7
     iterations_remaining: int = 1500
 
@@ -111,5 +115,7 @@ def flaw_maze(maze: list[list[Cell]]) -> None:
         if _wall_breakable_toward(maze, rd_cell, rd_direction):
             _remove_walls_toward(maze, rd_cell, rd_direction)
             walls_to_break -= 1
+            if on_step:
+                on_step(maze)
         
         iterations_remaining -= 1

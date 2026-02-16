@@ -29,10 +29,10 @@ class Cell:
 
     def __str__(self) -> str:
         return hex(
-            int(self.north) * 8 +
-            int(self.east) * 4 +
-            int(self.south) * 2 +
-            int(self.west) * 1
+            int(self.north) * 1 +
+            int(self.east) * 2 +
+            int(self.south) * 4 +
+            int(self.west) * 8
         )[2:].upper()
 
     def to_hex(self) -> str:
