@@ -100,6 +100,7 @@ class GUI:
             entry,
             exit_pos
         )
+        self.__write_output_file(maze, entry, exit_pos, path)
 
         while True:
             self.__draw_maze(
