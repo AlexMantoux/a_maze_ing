@@ -423,7 +423,7 @@ class GUI:
             search_frontier: set[tuple[int, int]] | None = None,
             search_current: tuple[int, int] | None = None
     ) -> None:
-        stdscr.clear()
+        stdscr.erase()
         search_frontier = search_frontier or set()
         rows = len(maze)
         cols = len(maze[0]) if rows > 0 else 0
@@ -446,7 +446,8 @@ class GUI:
                 )
 
         self.__draw_help(stdscr, rows)
-        stdscr.refresh()
+        stdscr.noutrefresh()
+        curses.doupdate()
 
     def __draw_cell_structured(
             self,
