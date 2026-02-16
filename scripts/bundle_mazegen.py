@@ -154,6 +154,7 @@ def bundle_generator() -> None:
     # Read all algorithm files
     dfs_src = SRC_DIR / "algorithms" / "dfs.py"
     kruskal_src = SRC_DIR / "algorithms" / "kruskal.py"
+    wilson_src = SRC_DIR / "algorithms" / "wilson.py"
     a_star_src = SRC_DIR / "algorithms" / "a_star.py"
     ft_pattern_src = SRC_DIR / "algorithms" / "ft_pattern.py"
     wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py"
@@ -162,6 +163,9 @@ def bundle_generator() -> None:
     dfs_imports, dfs_code = extract_code_parts(read_and_process(dfs_src))
     kruskal_imports, kruskal_code = extract_code_parts(
         read_and_process(kruskal_src)
+    )
+    wilson_imports, wilson_code = extract_code_parts(
+        read_and_process(wilson_src)
     )
     a_star_imports, a_star_code = extract_code_parts(
         read_and_process(a_star_src)
@@ -178,6 +182,7 @@ def bundle_generator() -> None:
     for imp_list in [
         dfs_imports,
         kruskal_imports,
+        wilson_imports,
         a_star_imports,
         ft_imports,
         wrapper_imports
@@ -198,7 +203,7 @@ def bundle_generator() -> None:
     header = '''"""Maze Generator module.
 
 This module provides the MazeGenerator class for creating random mazes
-using DFS or Kruskal algorithms, with A* pathfinding.
+using DFS, Kruskal, or Wilson algorithms, with A* pathfinding.
 
 This file is auto-generated from src/a_maze_ing sources.
 Do not edit directly - modify the source files instead.
@@ -231,6 +236,13 @@ Do not edit directly - modify the source files instead.
 # =============================================================================
 
 {kruskal_code}
+
+
+# =============================================================================
+# Wilson Algorithm (from algorithms/wilson.py)
+# =============================================================================
+
+{wilson_code}
 
 
 # =============================================================================

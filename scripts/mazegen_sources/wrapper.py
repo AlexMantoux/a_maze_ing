@@ -11,19 +11,21 @@ from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
+from src.a_maze_ing.algorithms.wilson import generate_wilson
 
 
 class MazeGenerator:
     """A configurable maze generator supporting multiple algorithms.
 
-    This class wraps the DFS and Kruskal generation algorithms and A* solver.
+    This class wraps the DFS, Kruskal, and Wilson generation algorithms and
+    A* solver.
     Generated mazes are perfect mazes (exactly one path between any two cells).
 
     Attributes:
         width: Number of cells horizontally.
         height: Number of cells vertically.
         seed: Random seed for reproducibility.
-        algorithm: 'DFS' or 'KRUSKAL'.
+        algorithm: 'DFS', 'KRUSKAL', or 'WILSON'.
         include_pattern: Whether to include the 42 pattern.
         maze: The generated maze grid (None until generate() is called).
 
@@ -46,9 +48,9 @@ class MazeGenerator:
             raise ValueError(f"Width must be at least 1, got {width}")
         if height < 1:
             raise ValueError(f"Height must be at least 1, got {height}")
-        if algorithm.upper() not in ("DFS", "KRUSKAL"):
+        if algorithm.upper() not in ("DFS", "KRUSKAL", "WILSON"):
             raise ValueError(
-                f"Algorithm must be 'DFS' or 'KRUSKAL', got {algorithm}"
+                f"Algorithm must be 'DFS', 'KRUSKAL', or 'WILSON', got {algorithm}"
             )
 
         self.width = width
@@ -84,6 +86,8 @@ class MazeGenerator:
 
         if self.algorithm == "KRUSKAL":
             self.maze = generate_kruskal(config, on_step)
+        elif self.algorithm == "WILSON":
+            self.maze = generate_wilson(config, on_step)
         else:
             self.maze = generate_dfs(config, on_step)
 
