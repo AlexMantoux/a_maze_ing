@@ -9,6 +9,7 @@ from curses import COLOR_MAGENTA, COLOR_RED, COLOR_WHITE, COLOR_YELLOW
 from src.a_maze_ing.cell import Cell
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
+from src.a_maze_ing.algorithms.wilson import generate_wilson
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.output import write_output_file
@@ -265,6 +266,8 @@ class GUI:
         algorithm = self.config.get("ALGORITHM", "DFS")
         if isinstance(algorithm, str) and algorithm.upper() == "KRUSKAL":
             return generate_kruskal
+        if isinstance(algorithm, str) and algorithm.upper() == "WILSON":
+            return generate_wilson
         return generate_dfs
 
     def __path_to_coords_and_edges(

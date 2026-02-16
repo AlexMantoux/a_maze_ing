@@ -97,7 +97,7 @@ def parse_config(path: str) \
         algorithm = result.get("ALGORITHM")
         if isinstance(algorithm, str):
             algorithm = algorithm.strip().upper()
-            if algorithm not in ("DFS", "KRUSKAL"):
+            if algorithm not in ("DFS", "KRUSKAL", "WILSON"):
                 raise ParsingError(
                     "Invalid ALGORITHM value. Expected DFS or KRUSKAL."
                 )
