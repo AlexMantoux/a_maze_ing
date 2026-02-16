@@ -1,4 +1,4 @@
-"""ASCII rendering for mazes."""
+"""ASCII and hexadecimal rendering for mazes."""
 
 from src.a_maze_ing.core.cell import Cell
 
@@ -13,16 +13,20 @@ def render_ascii(
     entry: tuple[int, int] | None = None,
     exit_point: tuple[int, int] | None = None
 ) -> str:
-    """
-    Render a maze grid as ASCII art.
+    """Render a maze grid as ASCII art.
 
     Each cell is represented as:
     +---+
     |   |
     +---+
 
-    Where walls are drawn based on the cell's wall attributes.
-    Entry point is displayed in green, exit point in red.
+    Args:
+        grid: 2D maze grid.
+        entry: Optional entry coordinates.
+        exit_point: Optional exit coordinates.
+
+    Returns:
+        Multiline ASCII representation of the maze.
     """
     if not grid or not grid[0]:
         return ""
@@ -70,10 +74,13 @@ def render_ascii(
 
 
 def render_hex(grid: list[list[Cell]]) -> str:
-    """
-    Render a maze grid as hexadecimal values.
+    """Render a maze grid as hexadecimal values.
 
-    Each cell is displayed as its hex representation based on walls
+    Args:
+        grid: 2D maze grid.
+
+    Returns:
+        Hexadecimal representation of the maze.
     """
     if not grid or not grid[0]:
         return ""

@@ -1,3 +1,5 @@
+"""Curses-based interactive maze viewer."""
+
 import curses
 import random
 import time
@@ -18,12 +20,21 @@ from typing import Callable
 
 
 class GUI:
+    """Curses-based interactive maze viewer."""
+
     def __init__(
         self,
         config: dict,
         maze: list[list[Cell]] | None = None,
         seed: int | None = None
     ) -> None:
+        """Initialize the UI and start the curses loop.
+
+        Args:
+            config: Parsed configuration dictionary.
+            maze: Optional pre-generated maze.
+            seed: Optional seed used for reproducibility.
+        """
         self.config = config
         self.initial_maze = maze
         self.initial_seed = seed
@@ -33,6 +44,11 @@ class GUI:
         wrapper(self.__main)
 
     def __main(self, stdscr: curses.window) -> None:
+        """Main curses loop handling input and rendering.
+
+        Args:
+            stdscr: Curses standard screen.
+        """
         start_color()
         use_default_colors()
         self.gray_bg = COLOR_BLACK
@@ -157,12 +173,22 @@ class GUI:
         text: str,
         cp: int
     ) -> None:
+        """Safely add text to the screen, ignoring curses errors.
+
+        Args:
+            stdscr: Curses standard screen.
+            y: Row position.
+            x: Column position.
+            text: Text to render.
+            cp: Color pair attribute.
+        """
         try:
             stdscr.addstr(y, x, text, cp)
         except error:
             pass
 
     def __apply_color_pairs(self) -> None:
+        """Initialize curses color pairs for the UI."""
         init_pair(
             self.wall_pair,
             self.wall_colors[self.wall_color_index],
@@ -193,6 +219,14 @@ class GUI:
             exit_pos: tuple[int, int],
             path: str | None = None
     ) -> None:
+        """Write the maze output file if configured.
+
+        Args:
+            maze: 2D maze grid.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+            path: Optional path string.
+        """
         output_file = self.config.get("OUTPUT_FILE")
         if not isinstance(output_file, str):
             return
@@ -208,6 +242,17 @@ class GUI:
             exit_pos: tuple[int, int],
             seed: int | None = None
     ) -> list[list[Cell]]:
+        """Generate a maze, optionally with animation.
+
+        Args:
+            stdscr: Curses standard screen.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+            seed: Optional seed override.
+
+        Returns:
+            Generated maze grid.
+        """
         if seed is not None:
             random.seed(seed)
         if self.animations_enabled:
@@ -226,6 +271,17 @@ class GUI:
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
     ) -> tuple[str, set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+        """Compute shortest path and derived rendering data.
+
+        Args:
+            stdscr: Curses standard screen.
+            maze: 2D maze grid.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+
+        Returns:
+            Tuple of (path, path_coords, path_edges).
+        """
         if self.show_path and self.animations_enabled:
             return self.__animate_search(stdscr, maze, entry, exit_pos)
         path = a_star(entry, exit_pos, maze)
@@ -238,10 +294,25 @@ class GUI:
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
     ) -> list[list[Cell]]:
+        """Generate a maze while animating carving steps.
+
+        Args:
+            stdscr: Curses standard screen.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+
+        Returns:
+            Generated maze grid.
+        """
         self.ft_pattern = set()
         generator = self.__select_generator()
 
         def on_step(grid: list[list[Cell]]) -> None:
+            """Animate maze generation steps.
+
+            Args:
+                grid: Current maze grid snapshot.
+            """
             if not self.ft_pattern:
                 self.ft_pattern = set(where_is_ft_pattern(grid))
             self.__draw_maze(
@@ -263,6 +334,11 @@ class GUI:
     def __select_generator(
         self,
     ) -> Callable[..., list[list[Cell]]]:
+        """Select the generator implementation from config.
+
+        Returns:
+            Maze generator callable.
+        """
         algorithm = self.config.get("ALGORITHM", "DFS")
         if isinstance(algorithm, str) and algorithm.upper() == "KRUSKAL":
             return generate_kruskal
@@ -275,6 +351,15 @@ class GUI:
             path: str,
             entry: tuple[int, int]
     ) -> tuple[set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+        """Convert a path string into coordinates and edge directions.
+
+        Args:
+            path: Path string using N/E/S/W.
+            entry: Entry coordinates.
+
+        Returns:
+            Tuple of (coords, edges) for rendering.
+        """
         x, y = entry
         coords: set[tuple[int, int]] = set()
         edges: dict[tuple[int, int], set[str]] = {}
@@ -302,12 +387,31 @@ class GUI:
             entry: tuple[int, int],
             exit_pos: tuple[int, int]
     ) -> tuple[str, set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+        """Animate A* search and return the final path data.
+
+        Args:
+            stdscr: Curses standard screen.
+            maze: 2D maze grid.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+
+        Returns:
+            Tuple of (path, path_coords, path_edges).
+        """
         def on_step(
                 current: tuple[int, int],
                 open_set: set[tuple[int, int]],
                 closed_set: set[tuple[int, int]],
                 path: str
         ) -> None:
+            """Animate A* search steps.
+
+            Args:
+                current: Current node in the search.
+                open_set: Frontier nodes.
+                closed_set: Explored nodes.
+                path: Current best path string.
+            """
             path_coords, path_edges = self.__path_to_coords_and_edges(
                 path,
                 entry
@@ -337,6 +441,18 @@ class GUI:
             exit_pos: tuple[int, int],
             path: str
     ) -> tuple[set[tuple[int, int]], dict[tuple[int, int], set[str]]]:
+        """Animate the display of a known path.
+
+        Args:
+            stdscr: Curses standard screen.
+            maze: 2D maze grid.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+            path: Path string using N/E/S/W.
+
+        Returns:
+            Tuple of (coords, edges) for rendering.
+        """
         x, y = entry
         coords: set[tuple[int, int]] = set()
         edges: dict[tuple[int, int], set[str]] = {}
@@ -368,7 +484,16 @@ class GUI:
         return coords, edges
 
     def __is_pattern_wall(self, x: int, y: int, direction: str) -> bool:
-        """Check if a wall should be colored as pattern wall."""
+        """Check if a wall should be colored as pattern wall.
+
+        Args:
+            x: Cell x coordinate.
+            y: Cell y coordinate.
+            direction: Direction or corner label.
+
+        Returns:
+            True if the wall belongs to the 42 pattern.
+        """
         if (x, y) in self.ft_pattern:
             return True
         if direction == "N" and (x, y - 1) in self.ft_pattern:
@@ -402,6 +527,12 @@ class GUI:
         return False
 
     def __draw_help(self, stdscr: curses.window, rows: int) -> None:
+        """Draw the help text under the maze.
+
+        Args:
+            stdscr: Curses standard screen.
+            rows: Number of maze rows.
+        """
         help_y = rows * 2 + 2
         help_text = (
             "r: new maze  p: toggle search/path  w: wall color  "
@@ -427,6 +558,19 @@ class GUI:
             search_frontier: set[tuple[int, int]] | None = None,
             search_current: tuple[int, int] | None = None
     ) -> None:
+        """Render the entire maze to the screen.
+
+        Args:
+            stdscr: Curses standard screen.
+            maze: 2D maze grid.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+            path_coords: Coordinates belonging to the path.
+            path_edges: Direction edges belonging to the path.
+            show_path: Whether to show the path.
+            search_frontier: Optional set of frontier nodes.
+            search_current: Optional current search node.
+        """
         stdscr.erase()
         search_frontier = search_frontier or set()
         rows = len(maze)
@@ -468,6 +612,22 @@ class GUI:
             search_frontier: set[tuple[int, int]],
             search_current: tuple[int, int] | None
     ) -> None:
+        """Draw a single maze cell with walls and overlays.
+
+        Args:
+            stdscr: Curses standard screen.
+            x: Cell x coordinate.
+            y: Cell y coordinate.
+            cell: Cell object to render.
+            max_y: Total rows in the maze.
+            max_x: Total columns in the maze.
+            entry: Entry coordinates.
+            exit_pos: Exit coordinates.
+            path_coords: Coordinates belonging to the path.
+            path_edges: Direction edges belonging to the path.
+            search_frontier: Frontier coordinates for search animation.
+            search_current: Current search coordinate.
+        """
         yy, xx = y * 2, x * 4
         is_pattern = (x, y) in self.ft_pattern
         edge_dirs = path_edges.get((x, y), set())

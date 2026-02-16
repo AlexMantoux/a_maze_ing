@@ -1,3 +1,5 @@
+"""Output file writer for mazes."""
+
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.core.cell import Cell
 from src.a_maze_ing.io.rendering import render_hex
@@ -10,6 +12,15 @@ def write_output_file(
     exit_pos: tuple[int, int],
     path: str | None = None
 ) -> None:
+    """Write the maze output file in the required format.
+
+    Args:
+        output_file: Output file path.
+        maze: 2D maze grid.
+        entry: Entry coordinates.
+        exit_pos: Exit coordinates.
+        path: Optional path string; computed if not provided.
+    """
     if path is None:
         path = a_star(entry, exit_pos, maze)
     with open(output_file, "w", encoding="utf-8") as f:

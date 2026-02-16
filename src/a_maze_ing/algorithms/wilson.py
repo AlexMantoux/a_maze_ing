@@ -1,3 +1,5 @@
+"""Wilson's algorithm for maze generation."""
+
 from collections.abc import Callable
 from random import choice as rd_choice
 from src.a_maze_ing.core.cell import Cell, CellState
@@ -9,6 +11,14 @@ from src.a_maze_ing.algorithms.grid_utils import (
 
 
 def _has_unvisited(grid: list[list[Cell]]):
+    """Check whether the grid contains unvisited cells.
+
+    Args:
+        grid: 2D maze grid.
+
+    Returns:
+        True if any cell is unvisited, otherwise False.
+    """
     return any(
         cell.state == CellState.UNVISITED
         for row in grid
@@ -17,6 +27,14 @@ def _has_unvisited(grid: list[list[Cell]]):
 
 
 def _get_random_unvisited(grid: list[list[Cell]]):
+    """Pick a random unvisited cell.
+
+    Args:
+        grid: 2D maze grid.
+
+    Returns:
+        A randomly selected unvisited cell.
+    """
     unvisited = [
         cell for row in grid
         for cell in row
@@ -29,6 +47,15 @@ def generate_wilson(
         config: dict[str, object],
         on_step: Callable[[list[list[Cell]]], None] | None = None
         ) -> list[list[Cell]]:
+    """Generate a perfect maze using Wilson's algorithm.
+
+    Args:
+        config: Configuration dictionary with WIDTH and HEIGHT keys.
+        on_step: Optional callback called after each carving step.
+
+    Returns:
+        Generated maze grid.
+    """
     width: int = config["WIDTH"]
     height: int = config["HEIGHT"]
     assert isinstance(width, int)

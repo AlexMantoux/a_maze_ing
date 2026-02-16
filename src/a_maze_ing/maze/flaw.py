@@ -1,3 +1,5 @@
+"""Post-processing for imperfect mazes."""
+
 from collections.abc import Callable
 from src.a_maze_ing.core.cell import Cell
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
@@ -6,6 +8,8 @@ from enum import Enum, auto
 
 
 class CardinalPoint(Enum):
+    """Cardinal directions used for wall manipulation."""
+
     NORTH = auto()
     SOUTH = auto()
     EAST = auto()
@@ -16,6 +20,15 @@ def _get_neighbors(
     cell: Cell,
     grid: list[list[Cell]]
 ) -> dict[CardinalPoint, Cell]:
+    """Return neighboring cells indexed by direction.
+
+    Args:
+        cell: Center cell.
+        grid: 2D maze grid.
+
+    Returns:
+        Mapping from direction to adjacent cell.
+    """
     x, y = cell.coordinates
     neighbors = {}
     height = len(grid)
@@ -38,6 +51,16 @@ def _wall_breakable_toward(
     cell: Cell,
     direction: CardinalPoint
 ) -> bool:
+    """Check if a wall can be removed toward a direction.
+
+    Args:
+        grid: 2D maze grid.
+        cell: Cell to consider.
+        direction: Direction to test.
+
+    Returns:
+        True if the wall can be removed without breaking constraints.
+    """
     if cell.coordinates in where_is_ft_pattern(grid):
         return False
     neighbors = _get_neighbors(cell, grid)
@@ -75,8 +98,12 @@ def _remove_walls_toward(
     cell: Cell,
     direction: CardinalPoint
 ) -> None:
-    """
-    Removes the walls between two adjacent cells.
+    """Remove walls between the given cell and its neighbor.
+
+    Args:
+        grid: 2D maze grid.
+        cell: Cell to modify.
+        direction: Direction of the neighbor.
     """
     x, y = cell.coordinates
     height = len(grid)
@@ -105,6 +132,12 @@ def flaw_maze(
     maze: list[list[Cell]],
     on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> None:
+    """Introduce flaws by breaking additional walls.
+
+    Args:
+        maze: 2D maze grid to modify in-place.
+        on_step: Optional callback called after each break.
+    """
     walls_to_break: int = len(maze) * len(maze[0]) // 7
     iterations_remaining: int = 1500
 

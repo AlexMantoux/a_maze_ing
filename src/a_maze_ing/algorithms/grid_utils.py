@@ -1,3 +1,5 @@
+"""Shared grid utilities for maze generation."""
+
 from src.a_maze_ing.core.cell import Cell, CellState
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 
@@ -6,6 +8,15 @@ def generate_full_grid(
         width: int,
         height: int
 ) -> tuple[list[list[Cell]], set[tuple[int, int]]]:
+    """Create a grid filled with closed walls and mark the 42 pattern.
+
+    Args:
+        width: Number of columns.
+        height: Number of rows.
+
+    Returns:
+        Tuple of (grid, pattern_positions).
+    """
     grid = [
         [
             Cell(
@@ -26,6 +37,16 @@ def get_neighbors(
         grid: list[list[Cell]],
         blocked: set[tuple[int, int]] | None = None
 ) -> list[Cell]:
+    """Return neighboring cells, excluding blocked positions.
+
+    Args:
+        coordinates: Cell coordinates as (x, y).
+        grid: 2D maze grid.
+        blocked: Optional set of blocked positions.
+
+    Returns:
+        List of neighboring cells.
+    """
     x, y = coordinates
     neighbors = []
     height = len(grid)
@@ -45,7 +66,12 @@ def get_neighbors(
 
 
 def remove_walls_between(cell1: Cell, cell2: Cell) -> None:
-    """Remove the walls between two adjacent cells."""
+    """Remove the walls between two adjacent cells.
+
+    Args:
+        cell1: First cell.
+        cell2: Second cell (adjacent).
+    """
     x1, y1 = cell1.coordinates
     x2, y2 = cell2.coordinates
 

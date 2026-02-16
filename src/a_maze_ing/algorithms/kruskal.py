@@ -1,3 +1,5 @@
+"""Kruskal-based maze generation."""
+
 from collections.abc import Callable
 from random import shuffle as random_shuffle
 from src.a_maze_ing.core.cell import Cell, CellState
@@ -8,17 +10,41 @@ from src.a_maze_ing.algorithms.grid_utils import (
 
 
 class _DisjointSet:
+    """Disjoint-set (union-find) structure for Kruskal."""
+
     def __init__(self, items: list[tuple[int, int]]) -> None:
+        """Initialize the disjoint set with individual items.
+
+        Args:
+            items: Items to store, keyed by coordinates.
+        """
         self.parent = {item: item for item in items}
         self.rank = {item: 0 for item in items}
 
     def find(self, item: tuple[int, int]) -> tuple[int, int]:
+        """Find the representative for an item.
+
+        Args:
+            item: Item to find.
+
+        Returns:
+            Root representative for the item.
+        """
         parent = self.parent[item]
         if parent != item:
             self.parent[item] = self.find(parent)
         return self.parent[item]
 
     def union(self, a: tuple[int, int], b: tuple[int, int]) -> bool:
+        """Union two sets if they are disjoint.
+
+        Args:
+            a: First item.
+            b: Second item.
+
+        Returns:
+            True if a union was performed, False if already connected.
+        """
         root_a = self.find(a)
         root_b = self.find(b)
         if root_a == root_b:
@@ -36,6 +62,14 @@ class _DisjointSet:
 
 
 def _get_edges(grid: list[list[Cell]]) -> list[tuple[Cell, Cell]]:
+    """Collect candidate edges between adjacent unvisited cells.
+
+    Args:
+        grid: 2D maze grid.
+
+    Returns:
+        List of cell pairs representing edges.
+    """
     edges: list[tuple[Cell, Cell]] = []
     height = len(grid)
     width = len(grid[0]) if height > 0 else 0
@@ -61,6 +95,15 @@ def generate_kruskal(
         config: dict[str, object],
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
+    """Generate a perfect maze using Kruskal's algorithm.
+
+    Args:
+        config: Configuration dictionary with WIDTH and HEIGHT keys.
+        on_step: Optional callback called after each carving step.
+
+    Returns:
+        Generated maze grid.
+    """
     width = config["WIDTH"]
     height = config["HEIGHT"]
     assert isinstance(width, int)

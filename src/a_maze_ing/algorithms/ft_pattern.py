@@ -1,3 +1,5 @@
+"""42 pattern placement for maze generation."""
+
 from src.a_maze_ing.core.cell import Cell
 
 _FT_PATTERN = [
@@ -12,6 +14,14 @@ _FT_PATTERN_WARNED = False
 
 
 def where_is_ft_pattern(grid: list[list[Cell]]) -> list[tuple[int, int]]:
+    """Compute the coordinates for the fixed '42' pattern.
+
+    Args:
+        grid: 2D maze grid.
+
+    Returns:
+        List of coordinates to mark as the 42 pattern. Empty if too small.
+    """
     if len(grid) < 7 or len(grid[0]) < 9:
         global _FT_PATTERN_WARNED
         if not _FT_PATTERN_WARNED:

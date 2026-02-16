@@ -1,3 +1,5 @@
+"""Depth-first search maze generation."""
+
 from collections.abc import Callable
 from random import choice as random_choice
 from src.a_maze_ing.core.cell import Cell, CellState
@@ -12,6 +14,15 @@ def generate_dfs(
         config: dict[str, object],
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
+    """Generate a perfect maze using recursive backtracker (DFS).
+
+    Args:
+        config: Configuration dictionary with WIDTH, HEIGHT, ENTRY keys.
+        on_step: Optional callback called after each carving step.
+
+    Returns:
+        Generated maze grid.
+    """
     entry = config["ENTRY"]
     assert isinstance(entry, tuple)
     x, y = entry

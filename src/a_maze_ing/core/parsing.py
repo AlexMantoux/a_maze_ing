@@ -1,15 +1,30 @@
+"""Configuration parsing utilities."""
+
 from re import match as re_match
 
 
 class ParsingError(Exception):
+    """Raised when the configuration file is invalid."""
+
     pass
 
 
 class CommentError(ParsingError):
+    """Internal exception used to skip comment and empty lines."""
+
     pass
 
 
 def _check_line_format(line: str) -> None:
+    """Validate the KEY=VALUE line format.
+
+    Args:
+        line: Raw line from configuration file.
+
+    Raises:
+        CommentError: If the line is empty or a comment.
+        ParsingError: If the line does not match KEY=VALUE.
+    """
     if not line.strip() or line[0] == "#":
         raise CommentError("Line is a comment.")
 
@@ -20,6 +35,14 @@ def _check_line_format(line: str) -> None:
 
 
 def _check_tuple_format(tuple_str: str) -> None:
+    """Validate tuple format for coordinates.
+
+    Args:
+        tuple_str: Tuple string to validate.
+
+    Raises:
+        ParsingError: If the tuple does not match INT,INT.
+    """
     PATTERN = r"^-?\d+,-?\d+$"
     if not re_match(PATTERN, tuple_str.strip()):
         raise ParsingError(
@@ -27,6 +50,17 @@ def _check_tuple_format(tuple_str: str) -> None:
 
 
 def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
+    """Parse a config line and convert to the expected type.
+
+    Args:
+        line: Raw config line in KEY=VALUE format.
+
+    Returns:
+        Parsed value for the key.
+
+    Raises:
+        ParsingError: If the key or value is invalid.
+    """
     KEYS_TYPES: dict[str, type] = {
         "WIDTH": int,
         "HEIGHT": int,
@@ -80,6 +114,18 @@ def _get_line_value(line: str) -> int | tuple[int, int] | str | bool | None:
 
 def parse_config(path: str) \
         -> dict[str, int | tuple[int, int] | str | bool | None]:
+    """Parse the configuration file from disk.
+
+    Args:
+        path: Path to the configuration file.
+
+    Returns:
+        Parsed configuration dictionary with defaults applied.
+
+    Raises:
+        ParsingError: If the file content is invalid.
+        OSError: If the file cannot be read.
+    """
     with open(path, "r") as f:
         result = {}
         for line in f:
@@ -135,6 +181,14 @@ def parse_config(path: str) \
 def check_config_mandatory(
         config: dict[str, int | tuple[int, int] | str | bool | None]
 ) -> None:
+    """Ensure all mandatory keys exist in the config.
+
+    Args:
+        config: Parsed configuration dictionary.
+
+    Raises:
+        ParsingError: If a mandatory key is missing.
+    """
     for key in ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]:
         if key not in config:
             raise ParsingError(f"Missing mandatory key '{key}' "

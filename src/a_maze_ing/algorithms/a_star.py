@@ -1,15 +1,35 @@
+"""A* pathfinding utilities for maze grids."""
+
 from collections.abc import Callable
 from heapq import heappush, heappop
 from src.a_maze_ing.core.cell import Cell
 
 
 def _manhattan_distance(pos: tuple[int, int], goal: tuple[int, int]) -> int:
+    """Compute the Manhattan distance between two coordinates.
+
+    Args:
+        pos: Current position as (x, y).
+        goal: Target position as (x, y).
+
+    Returns:
+        Manhattan distance between the two points.
+    """
     return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
 
 
 def _get_accessible_neighbors(
         cell: Cell, grid: list[list[Cell]]
 ) -> list[tuple[Cell, str]]:
+    """Return accessible neighboring cells and the move direction.
+
+    Args:
+        cell: Current cell.
+        grid: 2D maze grid.
+
+    Returns:
+        List of (neighbor_cell, direction) tuples with directions in N/E/S/W.
+    """
     x, y = cell.coordinates
     height = len(grid)
     width = len(grid[0]) if height > 0 else 0
@@ -36,6 +56,17 @@ def a_star(
             None
         ] | None = None
 ) -> str:
+    """Find the shortest path between entry and exit using A*.
+
+    Args:
+        entry: Entry coordinates as (x, y).
+        exit: Exit coordinates as (x, y).
+        grid: 2D maze grid.
+        on_step: Optional callback called on each exploration step.
+
+    Returns:
+        Path string composed of N/E/S/W steps. Empty string if no path.
+    """
     if not grid or not grid[0]:
         return ""
 
@@ -43,6 +74,15 @@ def a_star(
             came_from: dict[tuple[int, int], tuple[tuple[int, int], str]],
             current: tuple[int, int]
     ) -> str:
+        """Reconstruct the path string from the parent map.
+
+        Args:
+            came_from: Mapping from position to (previous, direction).
+            current: Current position to backtrack from.
+
+        Returns:
+            Path string from entry to current.
+        """
         steps: list[str] = []
         while current in came_from:
             previous, direction = came_from[current]
