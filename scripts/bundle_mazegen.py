@@ -158,7 +158,7 @@ def bundle_generator() -> None:
     ft_pattern_src = SRC_DIR / "algorithms" / "ft_pattern.py"
     grid_utils_src = SRC_DIR / "algorithms" / "grid_utils.py"
     flaw_src = SRC_DIR / "maze" / "flaw.py"
-    wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py"
+    wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py.part"
 
     # Extract code from each file
     dfs_imports, dfs_code = extract_code_parts(read_and_process(dfs_src))
@@ -305,7 +305,7 @@ Do not edit directly - modify the source files instead.
 
 def bundle_init() -> None:
     """Generate __init__.py for mazegen package."""
-    init_src = MAZEGEN_SRC_DIR / "__init__.py"
+    init_src = MAZEGEN_SRC_DIR / "__init__.py.part"
     content = read_and_process(init_src)
 
     dest = MAZEGEN_DIR / "__init__.py"
