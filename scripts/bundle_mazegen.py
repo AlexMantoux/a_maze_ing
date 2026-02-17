@@ -197,6 +197,7 @@ def bundle_generator() -> None:
         wrapper_imports
     ]:
         all_imports.update(imp_list)
+    all_imports.add("from collections.abc import Mapping")
 
     # Sort imports nicely
     from_future = [i for i in all_imports if "from __future__" in i]
@@ -222,6 +223,9 @@ Do not edit directly - modify the source files instead.
 
     imports_section = '\n'.join(sorted_imports)
     internal_import = "\nfrom mazegen.cell import Cell, CellState\n"
+    type_alias = (
+        "\nMazeConfig = Mapping[str, int | tuple[int, int] | str | bool]\n"
+    )
 
     # Combine all code sections
     combined_code = f"""
@@ -283,7 +287,13 @@ Do not edit directly - modify the source files instead.
 """
 
     # Write the combined file
-    full_content = header + imports_section + internal_import + combined_code
+    full_content = (
+        header
+        + imports_section
+        + internal_import
+        + type_alias
+        + combined_code
+    )
 
     # Clean up multiple blank lines
     full_content = re.sub(r'\n{3,}', '\n\n\n', full_content)
