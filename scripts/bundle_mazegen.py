@@ -22,6 +22,7 @@ STDLIB_IMPORTS = {
     "random",
     "heapq",
     "collections.abc",
+    "enum",
     "typing",
     "__future__",
 }
@@ -156,6 +157,7 @@ def bundle_generator() -> None:
     a_star_src = SRC_DIR / "algorithms" / "a_star.py"
     ft_pattern_src = SRC_DIR / "algorithms" / "ft_pattern.py"
     grid_utils_src = SRC_DIR / "algorithms" / "grid_utils.py"
+    flaw_src = SRC_DIR / "maze" / "flaw.py"
     wrapper_src = MAZEGEN_SRC_DIR / "wrapper.py"
 
     # Extract code from each file
@@ -175,6 +177,9 @@ def bundle_generator() -> None:
     grid_utils_imports, grid_utils_code = extract_code_parts(
         read_and_process(grid_utils_src)
     )
+    flaw_imports, flaw_code = extract_code_parts(
+        read_and_process(flaw_src)
+    )
     wrapper_imports, wrapper_code = extract_code_parts(
         read_and_process(wrapper_src)
     )
@@ -188,6 +193,7 @@ def bundle_generator() -> None:
         a_star_imports,
         ft_imports,
         grid_utils_imports,
+        flaw_imports,
         wrapper_imports
     ]:
         all_imports.update(imp_list)
@@ -232,6 +238,13 @@ Do not edit directly - modify the source files instead.
 # =============================================================================
 
 {grid_utils_code}
+
+
+# =============================================================================
+# Flaw Maze (from maze/flaw.py)
+# =============================================================================
+
+{flaw_code}
 
 
 # =============================================================================

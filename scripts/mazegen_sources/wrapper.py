@@ -12,6 +12,7 @@ from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
 from src.a_maze_ing.algorithms.wilson import generate_wilson
+from src.a_maze_ing.maze.flaw import flaw_maze
 
 
 class MazeGenerator:
@@ -26,7 +27,7 @@ class MazeGenerator:
         height: Number of cells vertically.
         seed: Random seed for reproducibility.
         algorithm: 'DFS', 'KRUSKAL', or 'WILSON'.
-        include_pattern: Whether to include the 42 pattern.
+        perfect: Whether to generate a perfect maze (no loops).
         maze: The generated maze grid (None until generate() is called).
 
     Example:
@@ -42,7 +43,7 @@ class MazeGenerator:
         height: int = 15,
         seed: int | None = None,
         algorithm: str = "DFS",
-        include_pattern: bool = True
+        perfect: bool = True
     ) -> None:
         if width < 1:
             raise ValueError(f"Width must be at least 1, got {width}")
@@ -58,7 +59,7 @@ class MazeGenerator:
         self.height = height
         self.seed = seed
         self.algorithm = algorithm.upper()
-        self.include_pattern = include_pattern
+        self.perfect = perfect
         self.maze: list[list[Cell]] | None = None
         self._pattern_cells: list[tuple[int, int]] = []
 
@@ -77,12 +78,10 @@ class MazeGenerator:
         if self.seed is not None:
             random.seed(self.seed)
 
-        # Build config dict for algorithm functions
         config = {
             "WIDTH": self.width,
             "HEIGHT": self.height,
             "ENTRY": entry,
-            "INCLUDE_PATTERN": self.include_pattern,
         }
 
         if self.algorithm == "KRUSKAL":
@@ -91,6 +90,9 @@ class MazeGenerator:
             self.maze = generate_wilson(config, on_step)
         else:
             self.maze = generate_dfs(config, on_step)
+
+        if self.maze and not self.perfect:
+            flaw_maze(self.maze, on_step=on_step)
 
         # Compute pattern cells
         if self.maze:

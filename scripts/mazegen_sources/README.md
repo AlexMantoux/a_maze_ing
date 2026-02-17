@@ -13,7 +13,7 @@ hex_string = gen.to_hex_string()
 ```
 
 ## Usage
-- `MazeGenerator(width, height, seed, algorithm, include_pattern)`
+- `MazeGenerator(width, height, seed, algorithm, perfect)`
 - `generate(entry=(0, 0), on_step=None)` returns the maze grid
 - `solve(entry, exit_pos, on_step=None)` returns the shortest path as `N/E/S/W`
 - `to_hex_string()` returns the maze in hex row format
