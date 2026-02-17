@@ -61,11 +61,7 @@ def is_internal_import(line: str) -> bool:
 
 
 def extract_code_parts(content: str) -> tuple[list[str], str]:
-    """Extract stdlib imports and code body from a file.
-
-    Returns:
-        (stdlib_imports, code_body_without_internal_imports)
-    """
+    """Extract stdlib imports and code body from a file."""
     lines = content.split('\n')
     stdlib_imports: list[str] = []
     code_lines: list[str] = []
@@ -73,17 +69,22 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
     in_docstring = False
     docstring_char = None
     at_start = True
+    
+    skip_until_paren_close = False 
 
     for line in lines:
         stripped = line.strip()
 
-        # Check if we're in a docstring first (higher priority)
+        if skip_until_paren_close:
+            if ')' in stripped:
+                skip_until_paren_close = False
+            continue
+
         if in_docstring:
             if docstring_char and docstring_char in stripped:
                 in_docstring = False
             continue
 
-        # Handle module-level docstrings at the start (skip them)
         if at_start and stripped.startswith(('"""', "'''")):
             docstring_char = stripped[:3]
             if stripped.count(docstring_char) >= 2 and len(stripped) > 3:
@@ -91,14 +92,13 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
             in_docstring = True
             continue
 
-        # After docstring, we're no longer at the start
         if stripped and not stripped.startswith('#'):
             at_start = False
 
-        # Categorize lines
         if stripped.startswith(('import ', 'from ')):
             if is_internal_import(stripped):
-                # Skip internal imports - they'll be inlined
+                if '(' in stripped and ')' not in stripped:
+                    skip_until_paren_close = True
                 continue
             elif is_stdlib_import(stripped):
                 if stripped not in stdlib_imports:
@@ -108,9 +108,7 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
         else:
             code_lines.append(line)
 
-    # Clean up leading/trailing empty lines
     code = '\n'.join(code_lines).strip()
-
     return stdlib_imports, code
 
 
