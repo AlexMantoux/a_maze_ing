@@ -1,12 +1,19 @@
-WIDTH=39
-HEIGHT=39
+# ---------------------------- #
+# --- Mandatory Parameters --- #
+# ---------------------------- #
+
+WIDTH=11
+HEIGHT=11
 ENTRY=0,0
-EXIT=28,28
+EXIT=10,10
 OUTPUT_FILE=maze.txt
-PERFECT=False
+PERFECT=True
 
-ALGORITHM=WILSON
-GUI=True
-ANIMATIONS=True
+# ---------------------------- #
+# --- Optional  Parameters --- #
+# ---------------------------- #
 
-# SEED=haasd
+# ALGORITHM=DFS
+# SEED=42
+# GUI=False
+# ANIMATIONS=True
