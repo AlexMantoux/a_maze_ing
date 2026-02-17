@@ -84,14 +84,14 @@ The generation code can be exported as a Python package `mazegen` (see
 ```python
 from mazegen import MazeGenerator
 
-gen = MazeGenerator(width=20, height=15, seed=42, algorithm="DFS")
+gen = MazeGenerator(width=20, height=15, seed=42, algorithm="DFS", perfect=True)
 maze = gen.generate(entry=(0, 0))
 path = gen.solve((0, 0), (19, 14))
 hex_string = gen.to_hex_string()
 ```
 
 Main features:
-- custom parameters (size, seed, algorithm)
+- custom parameters (size, seed, algorithm, perfect)
 - access to the structure (cells, 42 pattern)
 - solution via A*
 
