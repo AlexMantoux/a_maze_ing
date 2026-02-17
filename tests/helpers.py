@@ -52,8 +52,10 @@ def parse_output_file(
         [int(c, 16) for c in line.strip()] for line in grid_lines
     ]
     entry_str, exit_str, path_str = trailer_lines
-    entry: tuple[int, int] = tuple(int(v) for v in entry_str.split(","))
-    exit_pos: tuple[int, int] = tuple(int(v) for v in exit_str.split(","))
+    entry_parts = entry_str.split(",")
+    exit_parts = exit_str.split(",")
+    entry = (int(entry_parts[0]), int(entry_parts[1]))
+    exit_pos = (int(exit_parts[0]), int(exit_parts[1]))
     return grid, entry, exit_pos, path_str
 
 

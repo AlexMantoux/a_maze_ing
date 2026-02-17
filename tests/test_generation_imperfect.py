@@ -4,12 +4,13 @@ import random
 
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.maze.flaw import flaw_maze
 from tests.helpers import count_open_edges, has_fully_open_3x3
 
 
 def test_imperfect_maze_has_cycles() -> None:
-    config = {
+    config: MazeConfig = {
         "WIDTH": 21,
         "HEIGHT": 21,
         "ENTRY": (0, 0),

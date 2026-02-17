@@ -5,6 +5,7 @@ import random
 import pytest
 
 from src.a_maze_ing.algorithms.dfs import generate_dfs
+from src.a_maze_ing.core.types import MazeConfig
 
 
 def test_small_maze_prints_pattern_warning(
@@ -13,7 +14,7 @@ def test_small_maze_prints_pattern_warning(
     import src.a_maze_ing.algorithms.ft_pattern as ft_pattern
 
     ft_pattern._FT_PATTERN_WARNED = False
-    config = {
+    config: MazeConfig = {
         "WIDTH": 5,
         "HEIGHT": 5,
         "ENTRY": (0, 0),

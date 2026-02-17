@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from random import shuffle as random_shuffle
 from src.a_maze_ing.core.cell import Cell, CellState
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.algorithms.grid_utils import (
     generate_full_grid,
     remove_walls_between
@@ -92,7 +93,7 @@ def _get_edges(grid: list[list[Cell]]) -> list[tuple[Cell, Cell]]:
 
 
 def generate_kruskal(
-        config: dict[str, object],
+        config: MazeConfig,
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
     """Generate a perfect maze using Kruskal's algorithm.

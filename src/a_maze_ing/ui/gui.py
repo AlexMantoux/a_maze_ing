@@ -17,6 +17,7 @@ from src.a_maze_ing.algorithms.a_star import a_star
 from src.a_maze_ing.io.output import write_output_file
 from src.a_maze_ing.maze.flaw import flaw_maze
 from typing import Callable
+from src.a_maze_ing.core.types import MazeConfig
 
 
 class GUI:
@@ -24,7 +25,7 @@ class GUI:
 
     def __init__(
         self,
-        config: dict,
+        config: MazeConfig,
         maze: list[list[Cell]] | None = None,
         seed: int | None = None
     ) -> None:

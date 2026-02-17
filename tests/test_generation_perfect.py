@@ -8,6 +8,7 @@ from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.wilson import generate_wilson
 from src.a_maze_ing.algorithms.ft_pattern import where_is_ft_pattern
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.io.rendering import render_hex
 from tests.helpers import (
     count_open_edges,
@@ -21,7 +22,7 @@ from tests.helpers import (
 
 @pytest.mark.parametrize("algorithm", ["DFS", "KRUSKAL", "WILSON"])
 def test_reproducible_generation(algorithm: str) -> None:
-    config = {
+    config: MazeConfig = {
         "WIDTH": 15,
         "HEIGHT": 13,
         "ENTRY": (0, 0),
@@ -50,7 +51,7 @@ def test_reproducible_generation(algorithm: str) -> None:
 
 @pytest.mark.parametrize("algorithm", ["DFS", "KRUSKAL", "WILSON"])
 def test_maze_validity_and_structure(algorithm: str) -> None:
-    config = {
+    config: MazeConfig = {
         "WIDTH": 19,
         "HEIGHT": 17,
         "ENTRY": (0, 0),
@@ -122,8 +123,12 @@ def test_maze_validity_and_structure(algorithm: str) -> None:
                 continue
             assert degree(hex_grid, x, y, pattern_positions) > 0
 
-    reachable = reachable_nodes(hex_grid, config["ENTRY"], pattern_positions)
-    assert config["EXIT"] in reachable
+    entry = config["ENTRY"]
+    exit_pos = config["EXIT"]
+    assert isinstance(entry, tuple)
+    assert isinstance(exit_pos, tuple)
+    reachable = reachable_nodes(hex_grid, entry, pattern_positions)
+    assert exit_pos in reachable
     total_nodes = width * height - len(pattern_positions)
     assert len(reachable) == total_nodes
 

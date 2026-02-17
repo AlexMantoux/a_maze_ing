@@ -7,6 +7,7 @@ from collections.abc import Callable
 import random
 
 from src.a_maze_ing.core.cell import Cell
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.algorithms.dfs import generate_dfs
 from src.a_maze_ing.algorithms.kruskal import generate_kruskal
 from src.a_maze_ing.algorithms.a_star import a_star
@@ -78,7 +79,7 @@ class MazeGenerator:
         if self.seed is not None:
             random.seed(self.seed)
 
-        config = {
+        config: MazeConfig = {
             "WIDTH": self.width,
             "HEIGHT": self.height,
             "ENTRY": entry,

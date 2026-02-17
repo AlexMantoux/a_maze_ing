@@ -1,6 +1,6 @@
 """42 pattern placement for maze generation."""
 
-from src.a_maze_ing.core.cell import Cell
+from collections.abc import Sequence
 
 _FT_PATTERN = [
     [1, 0, 0, 0, 1, 1, 1],
@@ -13,7 +13,9 @@ _FT_PATTERN = [
 _FT_PATTERN_WARNED = False
 
 
-def where_is_ft_pattern(grid: list[list[Cell]]) -> list[tuple[int, int]]:
+def where_is_ft_pattern(
+    grid: Sequence[Sequence[object]]
+) -> list[tuple[int, int]]:
     """Compute the coordinates for the fixed '42' pattern.
 
     Args:

@@ -70,8 +70,8 @@ def extract_code_parts(content: str) -> tuple[list[str], str]:
     in_docstring = False
     docstring_char = None
     at_start = True
-    
-    skip_until_paren_close = False 
+
+    skip_until_paren_close = False
 
     for line in lines:
         stripped = line.strip()

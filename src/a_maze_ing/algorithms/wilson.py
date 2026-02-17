@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from random import choice as rd_choice
 from src.a_maze_ing.core.cell import Cell, CellState
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.algorithms.grid_utils import (
     generate_full_grid,
     get_neighbors,
@@ -44,7 +45,7 @@ def _get_random_unvisited(grid: list[list[Cell]]) -> Cell:
 
 
 def generate_wilson(
-        config: dict[str, object],
+        config: MazeConfig,
         on_step: Callable[[list[list[Cell]]], None] | None = None
         ) -> list[list[Cell]]:
     """Generate a perfect maze using Wilson's algorithm.
@@ -56,8 +57,8 @@ def generate_wilson(
     Returns:
         Generated maze grid.
     """
-    width: int = int(config["WIDTH"])
-    height: int = int(config["HEIGHT"])
+    width = config["WIDTH"]
+    height = config["HEIGHT"]
     assert isinstance(width, int)
     assert isinstance(height, int)
     grid, pattern_positions = generate_full_grid(width, height)

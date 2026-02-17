@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from random import choice as random_choice
 from src.a_maze_ing.core.cell import Cell, CellState
+from src.a_maze_ing.core.types import MazeConfig
 from src.a_maze_ing.algorithms.grid_utils import (
     generate_full_grid,
     get_neighbors,
@@ -11,7 +12,7 @@ from src.a_maze_ing.algorithms.grid_utils import (
 
 
 def generate_dfs(
-        config: dict[str, object],
+        config: MazeConfig,
         on_step: Callable[[list[list[Cell]]], None] | None = None
 ) -> list[list[Cell]]:
     """Generate a perfect maze using recursive backtracker (DFS).

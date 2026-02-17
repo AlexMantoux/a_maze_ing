@@ -16,8 +16,12 @@ def test_a_star_matches_shortest_path() -> None:
     }
     random.seed(777)
     grid = generate_dfs(config)
-    path = a_star(config["ENTRY"], config["EXIT"], grid)
+    entry = config["ENTRY"]
+    exit_pos = config["EXIT"]
+    assert isinstance(entry, tuple)
+    assert isinstance(exit_pos, tuple)
+    path = a_star(entry, exit_pos, grid)
     hex_grid = [[int(str(cell), 16) for cell in row] for row in grid]
-    shortest = bfs_distance(hex_grid, config["ENTRY"], config["EXIT"])
+    shortest = bfs_distance(hex_grid, entry, exit_pos)
     assert shortest is not None
     assert len(path) == shortest
