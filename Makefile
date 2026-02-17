@@ -1,6 +1,5 @@
 NAME = a_maze_ing
 POETRY = ~/.local/bin/poetry
-PY_FILES = $(shell find . -name "*.py")
 
 all: install
 
@@ -24,13 +23,13 @@ clean: clean-package
 
 lint:
 	@echo "Linting with flake8 and mypy..."
-	@$(POETRY) run flake8 $(PY_FILES)
-	@$(POETRY) run mypy $(PY_FILES) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	@$(POETRY) run flake8 .
+	@$(POETRY) run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
 	@echo "Linting with strict mode..."
-	@$(POETRY) run flake8 $(PY_FILES)
-	@$(POETRY) run mypy $(PY_FILES) --strict
+	@$(POETRY) run flake8 .
+	@$(POETRY) run mypy . --strict
 
 test:
 	@echo "Running tests with pytest..."

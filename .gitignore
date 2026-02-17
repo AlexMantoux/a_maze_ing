@@ -3,3 +3,5 @@ poetry.lock
 maze.txt
 mazegen
 dist
+__pycache__/
+*.pyc

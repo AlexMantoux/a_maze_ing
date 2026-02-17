@@ -52,9 +52,10 @@ Optional keys:
 - `ANIMATIONS`: `True` or `False` (default `True`)
 
 ## Maze generation algorithm
-Two algorithms are available:
+Three algorithms are available:
 - **DFS (recursive backtracker)**: fast, simple, produces long winding corridors.
 - **Kruskal**: generates a perfect maze using union-find.
+- **Wilson**: generates a perfect maze using a loop-breaker
 
 Default choice: **DFS**, for its simple implementation and recognizable visual
 style. Kruskal is available as an alternative.
