@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from src.a_maze_ing.core.parsing import ParsingError, check_config_mandatory, parse_config
+from src.a_maze_ing.core.parsing import ParsingError
+from src.a_maze_ing.core.parsing import check_config_mandatory, parse_config
 
 
 def _write_raw_config(tmp_path: Path, lines: list[str]) -> Path:

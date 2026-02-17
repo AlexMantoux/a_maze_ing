@@ -8,7 +8,7 @@ from tests.helpers import bfs_distance
 
 
 def test_a_star_matches_shortest_path() -> None:
-    config = {
+    config: dict[str, int | tuple[int, int]] = {
         "WIDTH": 13,
         "HEIGHT": 9,
         "ENTRY": (0, 0),
