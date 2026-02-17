@@ -50,7 +50,8 @@ class MazeGenerator:
             raise ValueError(f"Height must be at least 1, got {height}")
         if algorithm.upper() not in ("DFS", "KRUSKAL", "WILSON"):
             raise ValueError(
-                f"Algorithm must be 'DFS', 'KRUSKAL', or 'WILSON', got {algorithm}"
+                "Algorithm must be 'DFS', "
+                f"'KRUSKAL', or 'WILSON', got {algorithm}"
             )
 
         self.width = width

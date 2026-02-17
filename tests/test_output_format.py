@@ -5,7 +5,8 @@ from pathlib import Path
 import pytest
 
 from a_maze_ing import main
-from tests.helpers import bfs_distance, grid_bounds, parse_output_file, path_is_valid, write_config
+from tests.helpers import bfs_distance, grid_bounds
+from tests.helpers import parse_output_file, path_is_valid, write_config
 
 
 def test_output_file_format_and_path_validity(

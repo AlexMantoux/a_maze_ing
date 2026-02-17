@@ -41,16 +41,19 @@ def parse_output_file(
     raw = path.read_text(encoding="utf-8")
     assert raw.endswith("\n"), "Output file must end with a newline."
     parts = raw.split("\n\n")
-    assert len(parts) == 2, "Output file must contain a single blank line separator."
+    assert len(parts) == 2, "Output file must"
+    " contain a single blank line separator."
     grid_part, trailer_part = parts
     grid_lines = grid_part.splitlines()
     trailer_lines = trailer_part.splitlines()
     assert len(trailer_lines) == 3, "Output file must have 3 trailer lines."
 
-    grid = [[int(c, 16) for c in line.strip()] for line in grid_lines]
+    grid: list[list[int]] = [
+        [int(c, 16) for c in line.strip()] for line in grid_lines
+    ]
     entry_str, exit_str, path_str = trailer_lines
-    entry = tuple(int(v) for v in entry_str.split(","))
-    exit_pos = tuple(int(v) for v in exit_str.split(","))
+    entry: tuple[int, int] = tuple(int(v) for v in entry_str.split(","))
+    exit_pos: tuple[int, int] = tuple(int(v) for v in exit_str.split(","))
     return grid, entry, exit_pos, path_str
 
 
@@ -71,7 +74,11 @@ def grid_bounds(grid: list[list[int]]) -> tuple[int, int]:
     return len(grid[0]), len(grid)
 
 
-def open_neighbors(grid: list[list[int]], x: int, y: int) -> list[tuple[int, int]]:
+def open_neighbors(
+        grid: list[list[int]],
+        x: int,
+        y: int
+        ) -> list[tuple[int, int]]:
     width, height = grid_bounds(grid)
     value = grid[y][x]
     neighbors: list[tuple[int, int]] = []
@@ -105,7 +112,10 @@ def reachable_nodes(
     return visited
 
 
-def count_open_edges(grid: list[list[int]], blocked: set[tuple[int, int]]) -> int:
+def count_open_edges(
+        grid: list[list[int]],
+        blocked: set[tuple[int, int]]
+        ) -> int:
     width, height = grid_bounds(grid)
     edges = 0
     for y in range(height):
@@ -113,17 +123,33 @@ def count_open_edges(grid: list[list[int]], blocked: set[tuple[int, int]]) -> in
             if (x, y) in blocked:
                 continue
             value = grid[y][x]
-            if x + 1 < width and (x + 1, y) not in blocked and not wall_closed(value, "E"):
+            if (
+                x + 1 < width
+                and (x + 1, y) not in blocked
+                and not wall_closed(value, "E")
+            ):
                 edges += 1
-            if y + 1 < height and (x, y + 1) not in blocked and not wall_closed(value, "S"):
+            if (
+                y + 1 < height
+                and (x, y + 1) not in blocked
+                and not wall_closed(value, "S")
+            ):
                 edges += 1
     return edges
 
 
-def degree(grid: list[list[int]], x: int, y: int, blocked: set[tuple[int, int]]) -> int:
+def degree(
+        grid: list[list[int]],
+        x: int,
+        y: int,
+        blocked: set[tuple[int, int]]
+        ) -> int:
     if (x, y) in blocked:
         return 0
-    return sum((nx, ny) not in blocked for nx, ny in open_neighbors(grid, x, y))
+    return sum(
+        (nx, ny) not in blocked
+        for nx, ny in open_neighbors(grid, x, y)
+    )
 
 
 def bfs_distance(
@@ -174,7 +200,10 @@ def path_is_valid(
     return (x, y) == exit_pos
 
 
-def has_fully_open_3x3(grid: list[list[int]], blocked: set[tuple[int, int]]) -> bool:
+def has_fully_open_3x3(
+        grid: list[list[int]],
+        blocked: set[tuple[int, int]]
+        ) -> bool:
     width, height = grid_bounds(grid)
     for top_y in range(height - 2):
         for top_x in range(width - 2):

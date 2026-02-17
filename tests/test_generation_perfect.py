@@ -66,7 +66,9 @@ def test_maze_validity_and_structure(algorithm: str) -> None:
 
     hex_grid = [[int(str(cell), 16) for cell in row] for row in grid]
     width, height = grid_bounds(hex_grid)
-    pattern_positions = set(where_is_ft_pattern([[None] * width for _ in range(height)]))
+    pattern_positions = set(where_is_ft_pattern(
+        [[None] * width for _ in range(height)])
+        )
 
     for x in range(width):
         assert wall_closed(hex_grid[0][x], "N")
@@ -78,13 +80,37 @@ def test_maze_validity_and_structure(algorithm: str) -> None:
     for y in range(height):
         for x in range(width):
             if y > 0:
-                assert wall_closed(hex_grid[y][x], "N") == wall_closed(hex_grid[y - 1][x], "S")
+                assert wall_closed(
+                    hex_grid[y][x],
+                    "N"
+                    ) == wall_closed(
+                        hex_grid[y - 1][x],
+                        "S"
+                        )
             if y < height - 1:
-                assert wall_closed(hex_grid[y][x], "S") == wall_closed(hex_grid[y + 1][x], "N")
+                assert wall_closed(
+                    hex_grid[y][x],
+                    "S"
+                    ) == wall_closed(
+                        hex_grid[y + 1][x],
+                        "N"
+                        )
             if x > 0:
-                assert wall_closed(hex_grid[y][x], "W") == wall_closed(hex_grid[y][x - 1], "E")
+                assert wall_closed(
+                    hex_grid[y][x],
+                    "W"
+                    ) == wall_closed(
+                        hex_grid[y][x - 1],
+                        "E"
+                        )
             if x < width - 1:
-                assert wall_closed(hex_grid[y][x], "E") == wall_closed(hex_grid[y][x + 1], "W")
+                assert wall_closed(
+                    hex_grid[y][x],
+                    "E"
+                    ) == wall_closed(
+                        hex_grid[y][x + 1],
+                        "W"
+                        )
 
     assert pattern_positions, "Pattern should be present at this size."
     for x, y in pattern_positions:

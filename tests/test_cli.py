@@ -35,7 +35,9 @@ def test_entry_overlaps_pattern_is_rejected(
 ) -> None:
     output_path = tmp_path / "maze_output.txt"
     width, height = 19, 19
-    pattern_positions = where_is_ft_pattern([[None] * width for _ in range(height)])
+    pattern_positions = where_is_ft_pattern(
+        [[None] * width for _ in range(height)]
+        )
     entry = pattern_positions[0]
     config_path = write_config(
         tmp_path,

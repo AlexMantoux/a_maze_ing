@@ -10,7 +10,7 @@ from src.a_maze_ing.algorithms.grid_utils import (
 )
 
 
-def _has_unvisited(grid: list[list[Cell]]):
+def _has_unvisited(grid: list[list[Cell]]) -> bool:
     """Check whether the grid contains unvisited cells.
 
     Args:
@@ -26,7 +26,7 @@ def _has_unvisited(grid: list[list[Cell]]):
     )
 
 
-def _get_random_unvisited(grid: list[list[Cell]]):
+def _get_random_unvisited(grid: list[list[Cell]]) -> Cell:
     """Pick a random unvisited cell.
 
     Args:
@@ -56,8 +56,8 @@ def generate_wilson(
     Returns:
         Generated maze grid.
     """
-    width: int = config["WIDTH"]
-    height: int = config["HEIGHT"]
+    width: int = int(config["WIDTH"])
+    height: int = int(config["HEIGHT"])
     assert isinstance(width, int)
     assert isinstance(height, int)
     grid, pattern_positions = generate_full_grid(width, height)

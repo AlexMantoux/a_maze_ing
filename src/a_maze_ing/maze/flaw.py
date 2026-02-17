@@ -150,5 +150,5 @@ def flaw_maze(
             walls_to_break -= 1
             if on_step:
                 on_step(maze)
-        
+
         iterations_remaining -= 1

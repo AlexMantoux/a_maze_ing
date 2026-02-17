@@ -296,6 +296,7 @@ def bundle_py_typed() -> None:
     dest.write_text("")
     print(f"  Generated {dest.relative_to(ROOT)}")
 
+
 def bundle_readme() -> None:
     """Copy README for the mazegen package."""
     src = MAZEGEN_SRC_DIR / "README.md"
