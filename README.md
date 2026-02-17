@@ -96,7 +96,19 @@ Main features:
 - solution via A*
 
 ## Team & project management
-TODO
+- Trgascoi
+	- DFS & KRUSKAL
+	- A*
+	- GUI
+	- Tests
+	- Packaging
+	- README
+
+ - Amantoux
+	- Parsing
+	- Wilson
+	- Flaw system
+	- README
 
 ## Resources
 - Depth-first search (DFS) maze generation
@@ -107,3 +119,4 @@ TODO
 ### AI usage
 - Used to make researches about the algorithms and libraries
 - Used to find little errors that we had difficulty to find ourselves
+- Used to create tests
